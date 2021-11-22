@@ -11,3 +11,10 @@ $ make
 ## FEATURES
 - [ ] entity component system
 - [ ] color
+
+## RESOURCES
+
+some resources that were used when writing this project
+- [ECS design](https://austinmorlan.com/posts/entity_component_system/)
+- [another ECS design](https://www.david-colson.com/2020/02/09/making-a-simple-ecs.html)
+
