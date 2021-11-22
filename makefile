@@ -2,7 +2,7 @@ CXX=g++
 CXXFLAGS=-std=c++14 -Wall -MMD -g
 LIBS=-lncurses
 EXEC=age
-OBJECTS=age.o renderer.o
+OBJECTS=age.o renderer.o window.o
 DEPENDS=${OBJECTS:.o=.d}
 
 ${EXEC}: ${OBJECTS}
