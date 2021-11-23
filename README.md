@@ -12,6 +12,11 @@ $ make
 - [ ] entity component system
 - [ ] color
 
+## TODO
+- [ ] better way of assigning entity ids
+- [ ] error/exception handling
+- [ ] component array store pointers?
+
 ## RESOURCES
 
 some resources that were used when writing this project
