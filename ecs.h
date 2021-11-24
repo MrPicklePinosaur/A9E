@@ -18,10 +18,10 @@ using ComponentSignature = std::bitset<MAX_COMPONENTS>;
 
 class ComponentArrayBase;
 template<typename T> class ComponentArray;
+class System;
 
 class Scene
 {
-
 public:
     Scene();
     ~Scene();
@@ -31,14 +31,49 @@ public:
 
 class EntityManager
 {
-    std::map<Entity, ComponentSignature> entity_component;
+    using EntityComponent = std::map<Entity, ComponentSignature>;
+    EntityComponent ec;
     std::queue<Entity> free_list;
     Entity next_entity;
 public:
+
+    /* iterator that filters by component mask */
+    class EntityView
+    {
+        EntityComponent::iterator it;
+        EntityComponent::iterator it_end; // TODO find a way to get rid of this
+        ComponentSignature signature;
+        template<typename... ComponentIds>EntityView(EntityComponent::iterator it, EntityComponent::iterator it_end);
+    public:
+        bool operator!=(const EntityView& other) const;
+        const Entity& operator*() const;
+        EntityView& operator++();
+        friend class EntityManager;
+    };
+
     EntityManager();
     ~EntityManager();
     Entity CreateEntity();
     void DestroyEntity(Entity e);
+
+    template<typename... ComponentIds> EntityView begin();
+    template<typename... ComponentIds> EntityView end();
+
+};
+
+class SystemManager
+{
+    std::vector<System> systems;
+public:
+    SystemManager();
+    ~SystemManager();
+};
+
+class System
+{
+public:
+    System();
+    virtual ~System() = default;
 };
 
 class ComponentManager
@@ -80,6 +115,43 @@ public:
     inline iterator end() { return ca.begin()+ca_size; }
 };
 
+/* =-=-=-=-= EntityManager::EntityView =-=-=-=-=-= */
+
+template<typename... ComponentIds>
+EntityManager::EntityView::EntityView(EntityComponent::iterator it, EntityComponent::iterator it_end):
+    it{it}, it_end{it_end}, signature{0}
+{
+    /* if no component ids are passed in, assume we want a view for all entities */
+    if (sizeof...(ComponentIds) == 0) {
+        signature.set(); // set all bits to 1
+    } else {
+        // TODO need reference to component manager for this
+        /* ComponentIds ids[] = { GetComponentId<ComponentIds>()... }; */
+        /* for (int i = 0; i < sizeof...(ComponentIds); ++i) signature.set(ids[i]); */
+    }
+}
+
+bool
+EntityManager::EntityView::operator!=(const EntityView& other) const
+{
+    if (signature != other.signature) return false;
+    return it == other.it;
+}
+
+const Entity&
+EntityManager::EntityView::operator*() const
+{
+    return (*it).first;
+}
+
+EntityManager::EntityView&
+EntityManager::EntityView::operator++()
+{
+    // keep advancing until we find a matching signature
+    do { ++it; } while (signature != (signature & (*it).second) && it != it_end);
+    return *this;
+}
+
 /* =-=-=-=-= EntityManager =-=-=-=-=-= */
 
 EntityManager::EntityManager(): next_entity{0} {}
@@ -103,7 +175,7 @@ EntityManager::CreateEntity()
         free_list.pop();
     }
 
-    entity_component[new_entity];
+    ec[new_entity];
 
     return new_entity;
 }
@@ -111,7 +183,7 @@ EntityManager::CreateEntity()
 void 
 EntityManager::DestroyEntity(Entity e)
 {
-    size_t erased = entity_component.erase(e);
+    size_t erased = ec.erase(e);
     if (erased == 0) throw "Attempted to destroy non-existant entity";
 
     free_list.push(e);
