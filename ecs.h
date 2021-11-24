@@ -6,9 +6,11 @@
 #include <unordered_map>
 #include <array>
 #include <memory>
+#include <queue>
+#include <map>
 
 const int MAX_COMPONENTS = 32;
-const int MAX_ENTITIES = 1028;
+const int MAX_ENTITIES = 1028; // if we switch to using vector instead of array we can have this be uncapped
 
 using Entity = std::uint32_t;
 using ComponentId = std::uint8_t;
@@ -23,7 +25,20 @@ class Scene
 public:
     Scene();
     ~Scene();
-private:
+    Entity CreateEntity();
+    void DestroyEntity();
+};
+
+class EntityManager
+{
+    std::map<Entity, ComponentSignature> entity_component;
+    std::queue<Entity> free_list;
+    Entity next_entity;
+public:
+    EntityManager();
+    ~EntityManager();
+    Entity CreateEntity();
+    void DestroyEntity(Entity e);
 };
 
 class ComponentManager
@@ -64,6 +79,43 @@ public:
     inline iterator begin() { return ca.begin(); }
     inline iterator end() { return ca.begin()+ca_size; }
 };
+
+/* =-=-=-=-= EntityManager =-=-=-=-=-= */
+
+EntityManager::EntityManager(): next_entity{0} {}
+EntityManager::~EntityManager() {}
+
+// could add overload to 'preload' entity with components
+Entity
+EntityManager::CreateEntity()
+{
+    // check if we are at max entities
+    if (next_entity == MAX_ENTITIES && free_list.empty())
+        throw "Max entity limit reached, consider increasing MAX_ENTITIES";
+
+    Entity new_entity;
+    if (free_list.empty()) {
+        // if no items in free list, assign next id
+        new_entity = next_entity++;
+    } else {
+        // otherwise we can take from free list
+        new_entity = free_list.front();
+        free_list.pop();
+    }
+
+    entity_component[new_entity];
+
+    return new_entity;
+}
+
+void 
+EntityManager::DestroyEntity(Entity e)
+{
+    size_t erased = entity_component.erase(e);
+    if (erased == 0) throw "Attempted to destroy non-existant entity";
+
+    free_list.push(e);
+}
 
 /* =-=-=-=-= ComponentManager =-=-=-=-=-= */
 
