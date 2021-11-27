@@ -1,6 +1,7 @@
 #ifndef __ECS_H__
 #define __ECS_H__
 
+#include <iostream>
 #include <cstdint>
 #include <bitset>
 #include <unordered_map>
@@ -23,7 +24,7 @@ class System;
 class ComponentManager;
 class EntityManager;
 class SystemManager;
-template<typename... ComponentIds> class EntityView;
+class EntityView;
 
 class Scene
 {
@@ -38,23 +39,28 @@ public:
     template<typename T> void AddComponent(Entity e, const T& component);
     template<typename T> void RemoveComponent(Entity e);
     template<typename T> T& GetComponent(Entity e);
-    template<typename... ComponentIds> EntityView<ComponentIds...> MakeEntityView();
+    template<typename... ComponentIds> EntityView MakeEntityView();
+    template<typename T> ComponentId GetComponentId();
+    void Debug();
 };
 
 class EntityManager
 {
+    Scene& scene;
     EntityComponent ec;
     std::queue<Entity> free_list;
     Entity next_entity;
 public:
-    EntityManager();
+    EntityManager(Scene& scene);
     ~EntityManager();
     Entity CreateEntity();
     void DestroyEntity(Entity e);
-    template<typename... ComponentIds> EntityView<ComponentIds...> MakeEntityView();
+    template<typename T> void AddComponent(Entity e);
+    template<typename T> void RemoveComponent(Entity e);
+    template<typename... ComponentIds> EntityView MakeEntityView();
+    void Debug();
 };
 
-template<typename... ComponentIds> 
 class EntityView
 {
     EntityComponent& ec;
@@ -67,23 +73,25 @@ public:
         ComponentSignature signature;
         iterator(EntityComponent::iterator it, EntityComponent::iterator it_end, ComponentSignature signature);
     public:
-        bool operator!=(const EntityView& other) const;
+        bool operator!=(const iterator& other) const;
         const Entity& operator*() const;
         iterator& operator++();
         friend class EntityView;
     };
 
-    EntityView(EntityComponent& ec);
+    EntityView(EntityComponent& ec, ComponentSignature signature);
     iterator begin();
     iterator end();
 };
 
 class SystemManager
 {
+    Scene& scene;
     std::vector<System> systems;
 public:
-    SystemManager();
+    SystemManager(Scene& scene);
     ~SystemManager();
+    void Debug();
 };
 
 class System
@@ -106,14 +114,16 @@ public:
 
 class ComponentManager
 {
+    Scene& scene;
     std::unordered_map<ComponentId, std::unique_ptr<ComponentArrayBase>> ca_pool;
 public:
-    ComponentManager();
+    ComponentManager(Scene& scene);
     ~ComponentManager();
     template<typename T> void AddComponent(Entity e, const T& component);
     template<typename T> void RemoveComponent(Entity e);
     template<typename T> T& GetComponent(Entity e);
     template<typename T> ComponentId GetComponentId();
+    void Debug();
 private:
     template<typename T> ComponentArray<T>* GetComponentArray();
 };
@@ -146,9 +156,9 @@ public:
 /* =-=-=-=-= Scene =-=-=-=-=-= */
 
 Scene::Scene():
-    cm{std::make_unique<ComponentManager>()},
-    em{std::make_unique<EntityManager>()},
-    sm{std::make_unique<SystemManager>()} {}
+    cm{std::make_unique<ComponentManager>(*this)},
+    em{std::make_unique<EntityManager>(*this)},
+    sm{std::make_unique<SystemManager>(*this)} {}
 
 Scene::~Scene() {}
 
@@ -169,6 +179,7 @@ template<typename T> void
 Scene::AddComponent(Entity e, const T& component)
 {
     cm->AddComponent<T>(e, component);
+    em->AddComponent<T>(e);
 }
 
 template<typename T> void
@@ -183,16 +194,32 @@ Scene::GetComponent(Entity e)
     return cm->GetComponent<T>(e);
 }
 
-template<typename... ComponentIds> EntityView<ComponentIds...>
+template<typename... ComponentIds> EntityView
 Scene::MakeEntityView()
 {
     return em->MakeEntityView<ComponentIds...>();
 }
 
+template<typename T> ComponentId
+Scene::GetComponentId()
+{
+    return cm->GetComponentId<T>();
+}
+
+void
+Scene::Debug()
+{
+    cm->Debug();
+    em->Debug();
+    sm->Debug();
+}
+
 /* =-=-=-=-= SystemManager =-=-=-=-=-= */
 
-SystemManager::SystemManager() {}
+SystemManager::SystemManager(Scene& scene): scene{scene} {}
 SystemManager::~SystemManager() {}
+
+void SystemManager::Debug() {}
 
 /* =-=-=-=-= System =-=-=-=-=-= */
 
@@ -204,25 +231,24 @@ System::doUpdate()
 
 /* =-=-=-=-= EntityView::iterator =-=-=-=-=-= */
 
-template<typename... ComponentIds>
-EntityView<ComponentIds...>::iterator::iterator(EntityComponent::iterator it, EntityComponent::iterator it_end, ComponentSignature signature):
+EntityView::iterator::iterator(EntityComponent::iterator it, EntityComponent::iterator it_end, ComponentSignature signature):
     it{it}, it_end{it_end}, signature{signature} {}
 
-template<typename... ComponentIds> bool
-EntityView<ComponentIds...>::iterator::operator!=(const EntityView& other) const
+bool
+EntityView::iterator::operator!=(const iterator& other) const
 {
     if (signature != other.signature) return false;
     return it == other.it;
 }
 
-template<typename... ComponentIds> const Entity&
-EntityView<ComponentIds...>::iterator::operator*() const
+const Entity&
+EntityView::iterator::operator*() const
 {
     return (*it).first;
 }
 
-template<typename... ComponentIds> typename EntityView<ComponentIds...>::iterator&
-EntityView<ComponentIds...>::iterator::operator++()
+EntityView::iterator&
+EntityView::iterator::operator++()
 {
     // keep advancing until we find a matching signature
     do { ++it; } while (signature != (signature & (*it).second) && it != it_end);
@@ -231,35 +257,24 @@ EntityView<ComponentIds...>::iterator::operator++()
 
 /* =-=-=-=-= EntityView =-=-=-=-=-= */
 
-template<typename... ComponentIds>
-EntityView<ComponentIds...>::EntityView(EntityComponent& ec):
-    ec{ec}, signature{0}
-{
-    /* if no component ids are passed in, assume we want a view for all entities */
-    if (sizeof...(ComponentIds) == 0) {
-        signature.set(); // set all bits to 1
-    } else {
-        // TODO need reference to component manager for this
-        /* ComponentIds ids[] = { GetComponentId<ComponentIds>()... }; */
-        /* for (int i = 0; i < sizeof...(ComponentIds); ++i) signature.set(ids[i]); */
-    }
-}
+EntityView::EntityView(EntityComponent& ec, ComponentSignature signature):
+    ec{ec}, signature{signature} {}
 
-template<typename... ComponentIds> typename EntityView<ComponentIds...>::iterator
-EntityView<ComponentIds...>::begin()
+EntityView::iterator
+EntityView::begin()
 {
     return iterator{ec.begin(), ec.end(), signature};
 }
 
-template<typename... ComponentIds> typename EntityView<ComponentIds...>::iterator
-EntityView<ComponentIds...>::end()
+EntityView::iterator
+EntityView::end()
 {
     return iterator{ec.end(), ec.end(), signature};
 }
 
 /* =-=-=-=-= EntityManager =-=-=-=-=-= */
 
-EntityManager::EntityManager(): next_entity{0} {}
+EntityManager::EntityManager(Scene& scene): scene{scene}, next_entity{0} {}
 EntityManager::~EntityManager() {}
 
 // could add overload to 'preload' entity with components
@@ -294,29 +309,53 @@ EntityManager::DestroyEntity(Entity e)
     free_list.push(e);
 }
 
-#if 0
-template<typename... ComponentIds> EntityManager::EntityView
-EntityManager::begin()
+template<typename T> void
+EntityManager::AddComponent(Entity e)
 {
-    return EntityView<ComponentIds...>(ec.begin(), ec.end());
+    ComponentId c_id = scene.GetComponentId<T>();
+
+    // modify entity's component signature to include the id
+    if (ec.find(e) == ec.end()) throw "Entity does not exist";
+    if (ec[e].test(c_id)) throw "Entity already has component";
+    ec[e].set(c_id);
 }
 
-template<typename... ComponentIds> EntityManager::EntityView
-EntityManager::end()
+template<typename T> void
+EntityManager::RemoveComponent(Entity e)
 {
-    return EntityView<ComponentIds...>(ec.end(), ec.end());
-}
-#endif
+    ComponentId c_id = scene.GetComponentId<T>();
 
-template <typename... ComponentIds> EntityView<ComponentIds...>
+    // modify entity's component signature to uninclude the id
+    if (ec.find(e) == ec.end()) throw "Entity does not exist";
+    if (!ec[e].test(c_id)) throw "Entity does not have component";
+    ec[e].reset(c_id);
+}
+
+template <typename... ComponentIds> EntityView
 EntityManager::MakeEntityView()
 {
-    return EntityView<ComponentIds...>{ec};
+    ComponentSignature signature;
+    /* if no component ids are passed in, assume we want a view for all entities */
+    if (sizeof...(ComponentIds) == 0) {
+        signature.set(); // set all bits to 1
+    } else {
+        ComponentIds ids[] = { scene.GetComponentId<ComponentIds>()... };
+        for (int i = 0; i < sizeof...(ComponentIds); ++i) signature.set(ids[i]);
+    }
+    return EntityView{ec, signature};
+}
+
+void
+EntityManager::Debug()
+{
+    std::cout << "ENTITY MANAGER =-=-=-=-=-=-=" << std::endl;
+    for (auto& kv : ec)
+        std::cout << kv.second << ":" << kv.first << std::endl;
 }
 
 /* =-=-=-=-= ComponentManager =-=-=-=-=-= */
 
-ComponentManager::ComponentManager() {}
+ComponentManager::ComponentManager(Scene& scene): scene{scene} {}
 ComponentManager::~ComponentManager() {}
 
 template<typename T> void
@@ -358,6 +397,11 @@ ComponentManager::GetComponentArray()
         ca_pool[id] = std::make_unique<ComponentArray<T>>();
 
     return static_cast<ComponentArray<T>*>(ca_pool[id].get());
+}
+
+void
+ComponentManager::Debug()
+{
 }
 
 /* =-=-=-=-= ComponentArray =-=-=-=-=-= */

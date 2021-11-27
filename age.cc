@@ -12,13 +12,17 @@ main(int argc, char** argv)
 {
     Scene scene;
 
-    Entity e = scene.CreateEntity();
+    for (int i = 0; i < 20; ++i) {
+        Entity e = scene.CreateEntity();
+        Transform t{{1, 2}};
+        scene.AddComponent<Transform>(e, t);
+    }
 
-    Transform t{{1, 2}};
-    scene.AddComponent(e, t);
+    scene.Debug();
 
-
-
+    for (auto& e : scene.MakeEntityView<>()) {
+        std::cout << e << std::endl;
+    }
 
 #if 0
     ComponentManager cm;
