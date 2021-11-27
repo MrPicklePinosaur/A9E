@@ -14,14 +14,16 @@ main(int argc, char** argv)
 
     for (int i = 0; i < 20; ++i) {
         Entity e = scene.CreateEntity();
+        if (i % 2 == 1) continue;
         Transform t{{1, 2}};
         scene.AddComponent<Transform>(e, t);
     }
 
     scene.Debug();
 
-    for (auto& e : scene.MakeEntityView<>()) {
-        std::cout << e << std::endl;
+    EntityView v = scene.MakeEntityView<>();
+    for (auto it = v.begin(); it != v.end(); ++it) {
+        std::cout << *it << std::endl;
     }
 
 #if 0

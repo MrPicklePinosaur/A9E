@@ -71,7 +71,7 @@ public:
         EntityComponent::iterator it;
         EntityComponent::iterator it_end;
         ComponentSignature signature;
-        iterator(EntityComponent::iterator it, EntityComponent::iterator it_end, ComponentSignature signature);
+        iterator(EntityComponent::iterator it_beg, EntityComponent::iterator it_end, ComponentSignature signature);
     public:
         bool operator!=(const iterator& other) const;
         const Entity& operator*() const;
@@ -231,14 +231,18 @@ System::doUpdate()
 
 /* =-=-=-=-= EntityView::iterator =-=-=-=-=-= */
 
-EntityView::iterator::iterator(EntityComponent::iterator it, EntityComponent::iterator it_end, ComponentSignature signature):
-    it{it}, it_end{it_end}, signature{signature} {}
+EntityView::iterator::iterator(EntityComponent::iterator it_beg, EntityComponent::iterator it_end, ComponentSignature signature):
+    it{it_beg}, it_end{it_end}, signature{signature}
+{
+    // find first valid entity
+    while (signature != (signature & (*it).second) && it != it_end) ++it;
+}
 
 bool
 EntityView::iterator::operator!=(const iterator& other) const
 {
-    if (signature != other.signature) return false;
-    return it == other.it;
+    if (signature != other.signature) { return false; }
+    return it != other.it;
 }
 
 const Entity&
@@ -331,17 +335,21 @@ EntityManager::RemoveComponent(Entity e)
     ec[e].reset(c_id);
 }
 
-template <typename... ComponentIds> EntityView
+template<> EntityView
+EntityManager::MakeEntityView()
+{
+    /* if no component ids are passed in, assume we want a view for all entities */
+    ComponentSignature signature;
+    /* signature.set(); // set all bits to 1 */
+    return EntityView{ec, signature};
+}
+
+template<typename... ComponentIds> EntityView
 EntityManager::MakeEntityView()
 {
     ComponentSignature signature;
-    /* if no component ids are passed in, assume we want a view for all entities */
-    if (sizeof...(ComponentIds) == 0) {
-        signature.set(); // set all bits to 1
-    } else {
-        ComponentIds ids[] = { scene.GetComponentId<ComponentIds>()... };
-        for (int i = 0; i < sizeof...(ComponentIds); ++i) signature.set(ids[i]);
-    }
+    ComponentId ids[] = { scene.GetComponentId<ComponentIds>() ... };
+    for (int i = 0; i < sizeof...(ComponentIds); ++i) signature.set(ids[i]);
     return EntityView{ec, signature};
 }
 
