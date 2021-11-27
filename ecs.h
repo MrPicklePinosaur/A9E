@@ -15,6 +15,7 @@ const int MAX_ENTITIES = 1028; // if we switch to using vector instead of array 
 using Entity = std::uint32_t;
 using ComponentId = std::uint8_t;
 using ComponentSignature = std::bitset<MAX_COMPONENTS>;
+using EntityComponent = std::map<Entity, ComponentSignature>;
 
 class ComponentArrayBase;
 template<typename T> class ComponentArray;
@@ -22,6 +23,7 @@ class System;
 class ComponentManager;
 class EntityManager;
 class SystemManager;
+template<typename... ComponentIds> class EntityView;
 
 class Scene
 {
@@ -36,44 +38,45 @@ public:
     template<typename T> void AddComponent(Entity e, const T& component);
     template<typename T> void RemoveComponent(Entity e);
     template<typename T> T& GetComponent(Entity e);
+    template<typename... ComponentIds> EntityView<ComponentIds...> MakeEntityView();
 };
 
 class EntityManager
 {
-    using EntityComponent = std::map<Entity, ComponentSignature>;
     EntityComponent ec;
     std::queue<Entity> free_list;
     Entity next_entity;
 public:
-
-#if 0
-    template<typename... ComponentIds> 
-    class EntityView
-    {
-    public:
-        class iterator {
-            EntityComponent::iterator it;
-            EntityComponent::iterator it_end; // TODO find a way to get rid of this
-            ComponentSignature signature;
-            EntityView(EntityComponent::iterator it, EntityComponent::iterator it_end);
-        public:
-            bool operator!=(const EntityView& other) const;
-            const Entity& operator*() const;
-            EntityView& operator++();
-            friend class EntityView;
-        };
-
-        iterator begin();
-        iterator end();
-    };
-#endif
-
     EntityManager();
     ~EntityManager();
     Entity CreateEntity();
     void DestroyEntity(Entity e);
+    template<typename... ComponentIds> EntityView<ComponentIds...> MakeEntityView();
 };
 
+template<typename... ComponentIds> 
+class EntityView
+{
+    EntityComponent& ec;
+    ComponentSignature signature;
+public:
+
+    class iterator {
+        EntityComponent::iterator it;
+        EntityComponent::iterator it_end;
+        ComponentSignature signature;
+        iterator(EntityComponent::iterator it, EntityComponent::iterator it_end, ComponentSignature signature);
+    public:
+        bool operator!=(const EntityView& other) const;
+        const Entity& operator*() const;
+        iterator& operator++();
+        friend class EntityView;
+    };
+
+    EntityView(EntityComponent& ec);
+    iterator begin();
+    iterator end();
+};
 
 class SystemManager
 {
@@ -180,6 +183,12 @@ Scene::GetComponent(Entity e)
     return cm->GetComponent<T>(e);
 }
 
+template<typename... ComponentIds> EntityView<ComponentIds...>
+Scene::MakeEntityView()
+{
+    return em->MakeEntityView<ComponentIds...>();
+}
+
 /* =-=-=-=-= SystemManager =-=-=-=-=-= */
 
 SystemManager::SystemManager() {}
@@ -193,12 +202,38 @@ System::doUpdate()
     OnUpdate();
 }
 
-/* =-=-=-=-= EntityManager::EntityView =-=-=-=-=-= */
+/* =-=-=-=-= EntityView::iterator =-=-=-=-=-= */
 
-#if 0
 template<typename... ComponentIds>
-EntityManager::EntityView::EntityView(EntityComponent::iterator it, EntityComponent::iterator it_end):
-    it{it}, it_end{it_end}, signature{0}
+EntityView<ComponentIds...>::iterator::iterator(EntityComponent::iterator it, EntityComponent::iterator it_end, ComponentSignature signature):
+    it{it}, it_end{it_end}, signature{signature} {}
+
+template<typename... ComponentIds> bool
+EntityView<ComponentIds...>::iterator::operator!=(const EntityView& other) const
+{
+    if (signature != other.signature) return false;
+    return it == other.it;
+}
+
+template<typename... ComponentIds> const Entity&
+EntityView<ComponentIds...>::iterator::operator*() const
+{
+    return (*it).first;
+}
+
+template<typename... ComponentIds> typename EntityView<ComponentIds...>::iterator&
+EntityView<ComponentIds...>::iterator::operator++()
+{
+    // keep advancing until we find a matching signature
+    do { ++it; } while (signature != (signature & (*it).second) && it != it_end);
+    return *this;
+}
+
+/* =-=-=-=-= EntityView =-=-=-=-=-= */
+
+template<typename... ComponentIds>
+EntityView<ComponentIds...>::EntityView(EntityComponent& ec):
+    ec{ec}, signature{0}
 {
     /* if no component ids are passed in, assume we want a view for all entities */
     if (sizeof...(ComponentIds) == 0) {
@@ -210,27 +245,17 @@ EntityManager::EntityView::EntityView(EntityComponent::iterator it, EntityCompon
     }
 }
 
-bool
-EntityManager::EntityView::operator!=(const EntityView& other) const
+template<typename... ComponentIds> typename EntityView<ComponentIds...>::iterator
+EntityView<ComponentIds...>::begin()
 {
-    if (signature != other.signature) return false;
-    return it == other.it;
+    return iterator{ec.begin(), ec.end(), signature};
 }
 
-const Entity&
-EntityManager::EntityView::operator*() const
+template<typename... ComponentIds> typename EntityView<ComponentIds...>::iterator
+EntityView<ComponentIds...>::end()
 {
-    return (*it).first;
+    return iterator{ec.end(), ec.end(), signature};
 }
-
-EntityManager::EntityView&
-EntityManager::EntityView::operator++()
-{
-    // keep advancing until we find a matching signature
-    do { ++it; } while (signature != (signature & (*it).second) && it != it_end);
-    return *this;
-}
-#endif
 
 /* =-=-=-=-= EntityManager =-=-=-=-=-= */
 
@@ -282,6 +307,12 @@ EntityManager::end()
     return EntityView<ComponentIds...>(ec.end(), ec.end());
 }
 #endif
+
+template <typename... ComponentIds> EntityView<ComponentIds...>
+EntityManager::MakeEntityView()
+{
+    return EntityView<ComponentIds...>{ec};
+}
 
 /* =-=-=-=-= ComponentManager =-=-=-=-=-= */
 

@@ -18,6 +18,8 @@ main(int argc, char** argv)
     scene.AddComponent(e, t);
 
 
+
+
 #if 0
     ComponentManager cm;
 
