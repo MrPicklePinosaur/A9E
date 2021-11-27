@@ -12,6 +12,10 @@ main(int argc, char** argv)
 {
     Scene scene;
 
+    Entity e = scene.CreateEntity();
+
+    Transform t{{1, 2}};
+    scene.AddComponent(e, t);
 
 
 #if 0

@@ -10,21 +10,8 @@ protected:
     WINDOW* win;
 public:
     Window(int w, int h, int y, int x);
-    virtual ~Window();
-    void render();
-private:
-    virtual void pre_render();
-    virtual void main_render();
+    ~Window();
+    WINDOW* getwin();
 };
-
-class GameWindow final : public Window
-{
-public:
-    GameWindow(int w, int h, int y, int x);
-    ~GameWindow();
-    void pre_render() override;
-    void main_render() override;
-};
-
 
 #endif // __WINDOW_H__

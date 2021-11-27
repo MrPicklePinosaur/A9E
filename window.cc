@@ -13,31 +13,8 @@ Window::~Window()
     delwin(win);
 }
 
-void
-Window::render()
+WINDOW*
+Window::getwin()
 {
-    pre_render();
-    wrefresh(win);
+    return win;
 }
-
-void Window::pre_render() {}
-void Window::main_render() {}
-
-GameWindow::GameWindow(int w, int h, int y, int x):
-    Window{w, h, y, x}
-{
-}
-
-GameWindow::~GameWindow() {}
-
-void
-GameWindow::pre_render()
-{
-    box(win, 0, 0);
-}
-
-void
-GameWindow::main_render()
-{
-}
-
