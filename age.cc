@@ -10,7 +10,11 @@
 int
 main(int argc, char** argv)
 {
+    Scene scene;
 
+
+
+#if 0
     ComponentManager cm;
 
     for (int i = 0; i < 10; ++i) {
@@ -25,7 +29,6 @@ main(int argc, char** argv)
     auto t = cm.GetComponent<Transform>(9);
     std::cout << t.pos.x << "," << t.pos.y << std::endl;
 
-#if 0
     ComponentArray<Transform> ca;
 
     for (int i = 0; i < 10; ++i) {

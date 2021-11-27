@@ -19,14 +19,23 @@ using ComponentSignature = std::bitset<MAX_COMPONENTS>;
 class ComponentArrayBase;
 template<typename T> class ComponentArray;
 class System;
+class ComponentManager;
+class EntityManager;
+class SystemManager;
 
 class Scene
 {
+    std::unique_ptr<ComponentManager> cm;
+    std::unique_ptr<EntityManager> em;
+    std::unique_ptr<SystemManager> sm;
 public:
     Scene();
     ~Scene();
     Entity CreateEntity();
-    void DestroyEntity();
+    void DestroyEntity(Entity e);
+    template<typename T> void AddComponent(Entity e, const T& component);
+    template<typename T> void RemoveComponent(Entity e);
+    template<typename T> T& GetComponent(Entity e);
 };
 
 class EntityManager
@@ -37,29 +46,34 @@ class EntityManager
     Entity next_entity;
 public:
 
-    /* iterator that filters by component mask */
+#if 0
+    template<typename... ComponentIds> 
     class EntityView
     {
-        EntityComponent::iterator it;
-        EntityComponent::iterator it_end; // TODO find a way to get rid of this
-        ComponentSignature signature;
-        template<typename... ComponentIds>EntityView(EntityComponent::iterator it, EntityComponent::iterator it_end);
     public:
-        bool operator!=(const EntityView& other) const;
-        const Entity& operator*() const;
-        EntityView& operator++();
-        friend class EntityManager;
+        class iterator {
+            EntityComponent::iterator it;
+            EntityComponent::iterator it_end; // TODO find a way to get rid of this
+            ComponentSignature signature;
+            EntityView(EntityComponent::iterator it, EntityComponent::iterator it_end);
+        public:
+            bool operator!=(const EntityView& other) const;
+            const Entity& operator*() const;
+            EntityView& operator++();
+            friend class EntityView;
+        };
+
+        iterator begin();
+        iterator end();
     };
+#endif
 
     EntityManager();
     ~EntityManager();
     Entity CreateEntity();
     void DestroyEntity(Entity e);
-
-    template<typename... ComponentIds> EntityView begin();
-    template<typename... ComponentIds> EntityView end();
-
 };
+
 
 class SystemManager
 {
@@ -74,6 +88,17 @@ class System
 public:
     System();
     virtual ~System() = default;
+    void doUpdate();
+private:
+    virtual void OnUpdate() = 0;
+};
+
+class RendererSystem : public System
+{
+public:
+    RendererSystem();
+    ~RendererSystem();
+    void OnUpdate();
 };
 
 class ComponentManager
@@ -115,8 +140,62 @@ public:
     inline iterator end() { return ca.begin()+ca_size; }
 };
 
+/* =-=-=-=-= Scene =-=-=-=-=-= */
+
+Scene::Scene():
+    cm{std::make_unique<ComponentManager>()},
+    em{std::make_unique<EntityManager>()},
+    sm{std::make_unique<SystemManager>()} {}
+
+Scene::~Scene() {}
+
+Entity
+Scene::CreateEntity()
+{
+    return em->CreateEntity();
+}
+
+void
+Scene::DestroyEntity(Entity e)
+{
+    em->DestroyEntity(e);
+    // TODO remove all of entity's components too
+}
+
+template<typename T> void
+Scene::AddComponent(Entity e, const T& component)
+{
+    cm->AddComponent<T>(e, component);
+}
+
+template<typename T> void
+Scene::RemoveComponent(Entity e)
+{
+    cm->RemoveComponent<T>(e);
+}
+
+template<typename T> T&
+Scene::GetComponent(Entity e)
+{
+    return cm->GetComponent<T>(e);
+}
+
+/* =-=-=-=-= SystemManager =-=-=-=-=-= */
+
+SystemManager::SystemManager() {}
+SystemManager::~SystemManager() {}
+
+/* =-=-=-=-= System =-=-=-=-=-= */
+
+void
+System::doUpdate()
+{
+    OnUpdate();
+}
+
 /* =-=-=-=-= EntityManager::EntityView =-=-=-=-=-= */
 
+#if 0
 template<typename... ComponentIds>
 EntityManager::EntityView::EntityView(EntityComponent::iterator it, EntityComponent::iterator it_end):
     it{it}, it_end{it_end}, signature{0}
@@ -151,6 +230,7 @@ EntityManager::EntityView::operator++()
     do { ++it; } while (signature != (signature & (*it).second) && it != it_end);
     return *this;
 }
+#endif
 
 /* =-=-=-=-= EntityManager =-=-=-=-=-= */
 
@@ -188,6 +268,20 @@ EntityManager::DestroyEntity(Entity e)
 
     free_list.push(e);
 }
+
+#if 0
+template<typename... ComponentIds> EntityManager::EntityView
+EntityManager::begin()
+{
+    return EntityView<ComponentIds...>(ec.begin(), ec.end());
+}
+
+template<typename... ComponentIds> EntityManager::EntityView
+EntityManager::end()
+{
+    return EntityView<ComponentIds...>(ec.end(), ec.end());
+}
+#endif
 
 /* =-=-=-=-= ComponentManager =-=-=-=-=-= */
 
