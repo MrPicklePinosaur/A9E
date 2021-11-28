@@ -78,7 +78,7 @@ RendererSystem::OnUpdate()
                 RenderBitmap data = std::get<RenderBitmap>(render.data);
                 // TODO this can be optimized (convert bitmap to list of strings and draw the entire line)
                 for (auto& pixel : data.pixels)
-                    r.DrawChar(pixel.c, pixel.x, pixel.y);
+                    r.DrawChar(pixel.c, transform.pos.x+pixel.x, transform.pos.y+pixel.y);
                 break;
             }
         }
@@ -87,7 +87,8 @@ RendererSystem::OnUpdate()
 
 void RendererSystem::AfterUpdate()
 {
-    r.RenderGameScreen();
+    r.DrawGameScreen();
+    r.RefreshGameScreen();
 }
 
 #endif // __RENDER_COMPONENT_H__

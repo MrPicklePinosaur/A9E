@@ -17,13 +17,15 @@ public:
     void DrawChar(char c, int x, int y);
     void DrawBox(char c, int x, int y, int w, int h);
     void WriteStatus(const std::string& s, int line);
-    void RenderGameScreen();
-    void RenderStatusScreen();
+    void RefreshGameScreen();
+    void RefreshStatusScreen();
+    void DrawGameScreen();
+    void DrawStatusScreen();
     void ClearGameScreen();
     void ClearStatusScreen();
 private:
-    void curses_init();
-    void curses_exit();
+    void CursesInit();
+    void CursesExit();
 };
 
 #endif // __RENDERER_H__

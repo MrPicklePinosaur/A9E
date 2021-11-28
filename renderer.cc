@@ -9,7 +9,7 @@
 
 CursesRenderer::CursesRenderer()
 {
-    curses_init();
+    CursesInit();
 
     game_win = std::make_unique<Window>(SCREEN_HEIGHT-STATUS_HEIGHT, SCREEN_WIDTH, 0, 0);
     status_win = std::make_unique<Window>(STATUS_HEIGHT, SCREEN_WIDTH, SCREEN_WIDTH-STATUS_HEIGHT, 0);
@@ -19,7 +19,7 @@ CursesRenderer::CursesRenderer()
 
 CursesRenderer::~CursesRenderer()
 {
-    curses_exit();
+    CursesExit();
 }
 
 void
@@ -42,19 +42,34 @@ CursesRenderer::DrawBox(char c, int x, int y, int w, int h)
 void
 CursesRenderer::WriteStatus(const std::string& s, int line)
 {
+    // clear line beforehand
+    wmove(status_win->getwin(), line, 0);
+    wclrtoeol(status_win->getwin());
+
     mvwprintw(status_win->getwin(), line, 0, s.c_str());
 }
 
 void
-CursesRenderer::RenderGameScreen()
+CursesRenderer::RefreshGameScreen()
 {
     wrefresh(game_win->getwin());
 }
 
 void
-CursesRenderer::RenderStatusScreen()
+CursesRenderer::RefreshStatusScreen()
 {
     wrefresh(status_win->getwin());
+}
+
+void
+CursesRenderer::DrawGameScreen()
+{
+    box(game_win->getwin(), 0, 0);
+}
+
+void
+CursesRenderer::DrawStatusScreen()
+{
 }
 
 void
@@ -70,7 +85,7 @@ CursesRenderer::ClearStatusScreen()
 }
 
 void
-CursesRenderer::curses_init()
+CursesRenderer::CursesInit()
 {
     // need to make sure this isn't called twice
 
@@ -83,7 +98,7 @@ CursesRenderer::curses_init()
 }
 
 void
-CursesRenderer::curses_exit()
+CursesRenderer::CursesExit()
 {
     endwin();
 }

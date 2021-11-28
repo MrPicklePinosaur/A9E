@@ -13,7 +13,9 @@ $ make
 - [ ] color
 
 ## TODO
-- [ ] better way of assigning entity ids
+- [x] better way of assigning entity ids
+- [ ] user input
+- [ ] collision system
 - [ ] error/exception handling
 - [ ] component array store pointers?
 

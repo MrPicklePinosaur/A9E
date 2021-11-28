@@ -23,7 +23,7 @@ AISystem::OnUpdate()
 {
     for (auto& e : scene.MakeEntityView<Transform>()) {
         Transform& transform = scene.GetComponent<Transform>(e);
-        transform.pos.x += 0.001f;
+        transform.pos.x += 1;
     }
 }
 

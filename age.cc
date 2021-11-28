@@ -1,6 +1,8 @@
 
 #include <cstdio>
 #include <iostream>
+#include <chrono>
+#include <thread>
 
 #include "renderer.h"
 #include "ecs.h"
@@ -22,13 +24,14 @@ main(int argc, char** argv)
 
     for (int i = 0; i < 1; ++i) {
         Entity e = scene.CreateEntity();
-        Transform t{{i, i}};
+        Transform t{{2, 2}};
         Render r{RenderType_Bitmap, bitmap};
         scene.AddComponent<Transform>(e, t);
         scene.AddComponent<Render>(e, r);
     }
 
     while(true) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
         render_system.Update(); 
         ai_system.Update(); 
     }
