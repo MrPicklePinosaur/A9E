@@ -6,11 +6,30 @@
 #include "ecs.h"
 #include "components/transform.h"
 #include "components/render.h"
+#include "components/ai.h"
 
 int
 main(int argc, char** argv)
 {
     Scene scene;
+
+    RendererSystem render_system{scene};
+    AISystem ai_system{scene};
+
+    for (int i = 0; i < 20; ++i) {
+        Entity e = scene.CreateEntity();
+        Transform t{{i, i}};
+        Render r{RenderType_Char};
+        scene.AddComponent<Transform>(e, t);
+        scene.AddComponent<Render>(e, r);
+    }
+
+    while(true) {
+        render_system.Update(); 
+        ai_system.Update(); 
+    }
+
+#if 0
 
     for (int i = 0; i < 20; ++i) {
         Entity e = scene.CreateEntity();
@@ -26,7 +45,8 @@ main(int argc, char** argv)
         std::cout << *it << std::endl;
     }
 
-#if 0
+    // =-=-=-=-=-=-=
+
     ComponentManager cm;
 
     for (int i = 0; i < 10; ++i) {

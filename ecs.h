@@ -39,6 +39,7 @@ public:
     template<typename T> void AddComponent(Entity e, const T& component);
     template<typename T> void RemoveComponent(Entity e);
     template<typename T> T& GetComponent(Entity e);
+    template<typename T> bool HasComponent(Entity e);
     template<typename... ComponentIds> EntityView MakeEntityView();
     template<typename T> ComponentId GetComponentId();
     void Debug();
@@ -87,29 +88,26 @@ public:
 class SystemManager
 {
     Scene& scene;
-    std::vector<System> systems;
+    std::vector<std::unique_ptr<System>> systems;
 public:
     SystemManager(Scene& scene);
     ~SystemManager();
+    template<typename T> T* RegisterSystem();
     void Debug();
 };
 
 class System
 {
+protected:
+    Scene& scene;
 public:
-    System();
+    System(Scene& scene);
     virtual ~System() = default;
-    void doUpdate();
+    void Update();
 private:
+    virtual void BeforeUpdate() = 0;
     virtual void OnUpdate() = 0;
-};
-
-class RendererSystem : public System
-{
-public:
-    RendererSystem();
-    ~RendererSystem();
-    void OnUpdate();
+    virtual void AfterUpdate() = 0;
 };
 
 class ComponentManager
@@ -122,6 +120,7 @@ public:
     template<typename T> void AddComponent(Entity e, const T& component);
     template<typename T> void RemoveComponent(Entity e);
     template<typename T> T& GetComponent(Entity e);
+    template<typename T> bool HasComponent(Entity e);
     template<typename T> ComponentId GetComponentId();
     void Debug();
 private:
@@ -147,6 +146,7 @@ public:
     void AddComponent(Entity e, const T& component);
     void RemoveComponent(Entity e);
     T& GetComponent(Entity e);
+    bool HasComponent(Entity e);
 
     using iterator = typename std::array<T, MAX_ENTITIES>::iterator;
     inline iterator begin() { return ca.begin(); }
@@ -194,6 +194,12 @@ Scene::GetComponent(Entity e)
     return cm->GetComponent<T>(e);
 }
 
+template<typename T> bool
+Scene::HasComponent(Entity e)
+{
+    return cm->HasComponent<T>(e);
+}
+
 template<typename... ComponentIds> EntityView
 Scene::MakeEntityView()
 {
@@ -219,14 +225,24 @@ Scene::Debug()
 SystemManager::SystemManager(Scene& scene): scene{scene} {}
 SystemManager::~SystemManager() {}
 
+template<typename T> T*
+RegisterSystem()
+{
+
+}
+
 void SystemManager::Debug() {}
 
 /* =-=-=-=-= System =-=-=-=-=-= */
 
+System::System(Scene& scene): scene{scene} {}
+
 void
-System::doUpdate()
+System::Update()
 {
+    BeforeUpdate();
     OnUpdate();
+    AfterUpdate();
 }
 
 /* =-=-=-=-= EntityView::iterator =-=-=-=-=-= */
@@ -349,7 +365,7 @@ EntityManager::MakeEntityView()
 {
     ComponentSignature signature;
     ComponentId ids[] = { scene.GetComponentId<ComponentIds>() ... };
-    for (int i = 0; i < sizeof...(ComponentIds); ++i) signature.set(ids[i]);
+    for (size_t i = 0; i < sizeof...(ComponentIds); ++i) signature.set(ids[i]);
     return EntityView{ec, signature};
 }
 
@@ -385,6 +401,13 @@ ComponentManager::GetComponent(Entity e)
 {
     ComponentArray<T>* ca = GetComponentArray<T>();
     return ca->GetComponent(e);
+}
+
+template<typename T> bool
+ComponentManager::HasComponent(Entity e)
+{
+    ComponentArray<T>* ca = GetComponentArray<T>();
+    return ca->HasComponent(e);
 }
 
 int component_id_counter = 0;
@@ -464,6 +487,12 @@ ComponentArray<T>::GetComponent(Entity e)
         throw "Entity does not have component";
 
     return ca[entity_to_index.at(e)];
+}
+
+template<typename T> bool
+ComponentArray<T>::HasComponent(Entity e)
+{
+    return (entity_to_index.find(e) != entity_to_index.end());
 }
 
 #endif // __ECS_H__

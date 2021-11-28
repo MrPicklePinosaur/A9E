@@ -15,7 +15,6 @@ CursesRenderer::CursesRenderer()
     status_win = std::make_unique<Window>(STATUS_HEIGHT, SCREEN_WIDTH, SCREEN_WIDTH-STATUS_HEIGHT, 0);
 
     refresh();
-    getch();
 }
 
 CursesRenderer::~CursesRenderer()
@@ -29,8 +28,7 @@ CursesRenderer::DrawChar(char c, int x, int y)
     if (x < 0 || y < 0) return; 
     if (x > SCREEN_WIDTH || y > SCREEN_HEIGHT) return; // TODO account for borders and stuff
 
-    char* charstar = &c;
-    mvwprintw(game_win->getwin(), y, x, charstar);
+    mvwprintw(game_win->getwin(), y, x, std::string(1, c).c_str());
 }
 
 void
@@ -50,11 +48,13 @@ CursesRenderer::WriteStatus(const std::string& s, int line)
 void
 CursesRenderer::RenderGameScreen()
 {
+    wrefresh(game_win->getwin());
 }
 
 void
 CursesRenderer::RenderStatusScreen()
 {
+    wrefresh(status_win->getwin());
 }
 
 void
