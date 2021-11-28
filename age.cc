@@ -16,10 +16,14 @@ main(int argc, char** argv)
     RendererSystem render_system{scene};
     AISystem ai_system{scene};
 
-    for (int i = 0; i < 20; ++i) {
+    RenderBitmap bitmap{
+        {{'A',0,0},{'B',1,0},{'C',0,1},{'D',1,1}}
+    };
+
+    for (int i = 0; i < 1; ++i) {
         Entity e = scene.CreateEntity();
         Transform t{{i, i}};
-        Render r{RenderType_Char};
+        Render r{RenderType_Bitmap, bitmap};
         scene.AddComponent<Transform>(e, t);
         scene.AddComponent<Render>(e, r);
     }
