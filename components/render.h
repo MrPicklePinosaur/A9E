@@ -6,6 +6,13 @@
 #include "transform.h"
 #include "../ecs.h"
 
+enum RenderType {
+    RenderType_None = 0,
+    RenderType_Char,
+    RenderType_Box,
+    RenderType_Bitmap
+};
+
 struct RenderChar {
     char c;
 };
@@ -20,13 +27,6 @@ struct BitmapPixel {
 };
 struct RenderBitmap {
     std::vector<BitmapPixel> pixels;
-};
-
-enum RenderType {
-    RenderType_None = 0,
-    RenderType_Char,
-    RenderType_Box,
-    RenderType_Bitmap
 };
 
 struct Render {

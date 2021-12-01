@@ -6,10 +6,15 @@
 struct vec2 {
     float x = 0.0f;
     float y = 0.0f;
+
     vec2& operator+=(const vec2& other);
     vec2& operator*=(float s);
+    vec2& operator/=(float s);
     friend vec2 operator+(vec2 l, const vec2& r);
     friend vec2 operator*(vec2 l, float s);
+    friend vec2 operator/(vec2 l, float s);
+
+    static vec2 zero();
 };
 std::ostream& operator<<(std::ostream& os, const vec2& v);
 
@@ -22,9 +27,16 @@ vec2::operator+=(const vec2& other)
 }
 
 vec2&
-vec2::operator*=(float scale)
+vec2::operator*=(float s)
 {
-    x *= scale;
+    x *= s;
+    return *this;
+}
+
+vec2&
+vec2::operator/=(float s)
+{
+    x /= s;
     return *this;
 }
 
@@ -42,11 +54,24 @@ operator*(vec2 l, float s)
     return l; 
 }
 
+vec2
+operator/(vec2 l, float s)
+{
+    l /= s;
+    return l;
+}
+
 std::ostream&
 operator<<(std::ostream& os, const vec2& v)
 {
     os << "(" << v.x << "," << v.y << ")";
     return os;
+}
+
+vec2
+vec2::zero()
+{
+    return vec2{};
 }
 
 #endif // __VEC_H__

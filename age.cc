@@ -30,8 +30,6 @@ main(int argc, char** argv)
         Transform t{{2, 2}};
         Render r{RenderType_Bitmap, bitmap};
         PhysicsBody pb;
-        /* pb.velocity = {1, 1}; */
-        pb.acceleration = {3, 0};
         scene.AddComponent<Transform>(e, t);
         scene.AddComponent<Render>(e, r);
         scene.AddComponent<PhysicsBody>(e, pb);
