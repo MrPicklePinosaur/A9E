@@ -4,9 +4,11 @@
 #include <chrono>
 #include <thread>
 
+#include "config.h"
 #include "renderer.h"
 #include "ecs.h"
 #include "components/transform.h"
+#include "components/physicsbody.h"
 #include "components/render.h"
 #include "components/ai.h"
 
@@ -17,6 +19,7 @@ main(int argc, char** argv)
 
     RendererSystem render_system{scene};
     AISystem ai_system{scene};
+    PhysicsSystem physics_system{scene};
 
     RenderBitmap bitmap{
         {{'A',0,0},{'B',1,0},{'C',0,1},{'D',1,1}}
@@ -26,14 +29,19 @@ main(int argc, char** argv)
         Entity e = scene.CreateEntity();
         Transform t{{2, 2}};
         Render r{RenderType_Bitmap, bitmap};
+        PhysicsBody pb;
+        /* pb.velocity = {1, 1}; */
+        pb.acceleration = {3, 0};
         scene.AddComponent<Transform>(e, t);
         scene.AddComponent<Render>(e, r);
+        scene.AddComponent<PhysicsBody>(e, pb);
     }
 
     while(true) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        std::this_thread::sleep_for(std::chrono::milliseconds(static_cast<int>(TIME_STEP*1000)));
         render_system.Update(); 
-        ai_system.Update(); 
+        physics_system.Update();
+        /* ai_system.Update(); */ 
     }
 
 #if 0

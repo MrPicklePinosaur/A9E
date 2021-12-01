@@ -58,8 +58,8 @@ void
 RendererSystem::OnUpdate()
 {
     for (auto& e : scene.MakeEntityView<Transform,Render>()) {
-        Transform transform = scene.GetComponent<Transform>(e);
-        Render render = scene.GetComponent<Render>(e);
+        Transform& transform = scene.GetComponent<Transform>(e);
+        Render& render = scene.GetComponent<Render>(e);
 
         if (!render.visible) continue;
 
