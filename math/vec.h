@@ -2,11 +2,13 @@
 #define __VEC_H__
 
 #include <ostream>
+#include <cmath>
 
 struct vec2 {
     float x = 0.0f;
     float y = 0.0f;
 
+    float magnitude();
     vec2& operator+=(const vec2& other);
     vec2& operator*=(float s);
     vec2& operator/=(float s);
@@ -17,6 +19,13 @@ struct vec2 {
     static vec2 zero();
 };
 std::ostream& operator<<(std::ostream& os, const vec2& v);
+
+// try to write this without sqrt
+float
+vec2::magnitude()
+{
+    return sqrt(x*x+y*y);
+}
 
 vec2&
 vec2::operator+=(const vec2& other)

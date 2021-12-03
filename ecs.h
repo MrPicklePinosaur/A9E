@@ -134,7 +134,7 @@ public:
 };
 
 template<typename T>
-class ComponentArray : public ComponentArrayBase
+class ComponentArray final : public ComponentArrayBase
 {
     std::array<T, MAX_ENTITIES> ca;
     size_t ca_size;

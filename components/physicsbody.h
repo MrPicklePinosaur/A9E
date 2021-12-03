@@ -5,7 +5,6 @@
 #include "../math/vec.h"
 #include "../config.h"
 #include "transform.h"
-#include "collider.h"
 
 struct PhysicsBody {
     float mass = 1.0f;
