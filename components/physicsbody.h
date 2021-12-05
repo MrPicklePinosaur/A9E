@@ -10,6 +10,7 @@ struct PhysicsBody {
     float mass = 1.0f;
     float gravityScale = 1.0f;
     float linearDampening = 0.0f;
+    float restitution = 1.0f;
     bool isSimulated = true;
     bool useGravity = true;
     vec2 velocity;

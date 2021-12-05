@@ -9,6 +9,7 @@ struct vec2 {
     float y = 0.0f;
 
     float magnitude();
+    float dot(const vec2& other);
     vec2& operator+=(const vec2& other);
     vec2& operator-=(const vec2& other);
     vec2& operator*=(float s);
@@ -28,6 +29,12 @@ float
 vec2::magnitude()
 {
     return sqrt(x*x+y*y);
+}
+
+float
+vec2::dot(const vec2& other)
+{
+    return x*other.x+y*other.y;
 }
 
 vec2&
@@ -104,6 +111,8 @@ vec2::zero()
 vec2
 vec2::normalize(vec2 v)
 {
-    return v/v.magnitude();    
+    float mag = v.magnitude();
+    if (mag == 0) return vec2::zero();
+    return v/mag;
 }
 #endif // __VEC_H__

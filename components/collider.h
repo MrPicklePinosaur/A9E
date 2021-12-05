@@ -26,7 +26,7 @@ struct CollisionData {
 struct Collision {
     Entity a;
     Entity b;
-    CollisionData col_data;
+    CollisionData collision_data;
 };
 
 CollisionData ColTestBoxVBox(const BoxColData* a_col, const Transform& a_trans, const BoxColData* b_col, const Transform& b_trans);
@@ -98,6 +98,8 @@ ColliderSystem::BeforeUpdate()
 void
 ColliderSystem::OnUpdate()
 {
+    std::vector<Collision> collisions;
+
     // find all possible collisions
     for (auto& e1 : scene.MakeEntityView<Transform,PhysicsBody,Collider>()) {
         Collider& e1_col = scene.GetComponent<Collider>(e1);
@@ -109,20 +111,21 @@ ColliderSystem::OnUpdate()
             Collider& e2_col = scene.GetComponent<Collider>(e2);
             Transform& e2_trans = scene.GetComponent<Transform>(e2);
 
-            CollisionData col_data = e1_col.data->CheckCollide(e1_trans, e2_col.data.get(), e1_trans);
-            if (col_data.isCollision) {
-                /* std::cout << "COLLISION!!! =-=-=-=-=\n"; */
-                /* std::cout << "e1: " << e1; */
-                /* std::cout << "e2: " << e2; */
-                /* std::cout << "normal: " << col_data.normal; */
-                /* std::cout << "depth: " << col_data.depth; */
-            }
+            CollisionData collision_data = e1_col.data->CheckCollide(e1_trans, e2_col.data.get(), e2_trans);
+            if (collision_data.isCollision)
+                collisions.push_back(Collision{.a = e1, .b = e2, .collision_data = collision_data});
         }
     }
+
+    // calculate new velocities
+    for (auto& c : collisions) {
+        PhysicsBody& pb_a = scene.GetComponent<PhysicsBody>(c.a);
+        PhysicsBody& pb_b = scene.GetComponent<PhysicsBody>(c.b);
+    }
+
 }
 
 void ColliderSystem::AfterUpdate() {}
-
 
 CollisionData
 ColTestBoxVBox(const BoxColData* a_col, const Transform& a_trans, const BoxColData* b_col, const Transform& b_trans)
