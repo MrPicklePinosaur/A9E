@@ -119,6 +119,7 @@ public:
     ~ComponentManager();
     template<typename T> void AddComponent(Entity e, const T& component);
     template<typename T> void RemoveComponent(Entity e);
+    void RemoveAllComponents(Entity e);
     template<typename T> T& GetComponent(Entity e);
     template<typename T> bool HasComponent(Entity e);
     template<typename T> ComponentId GetComponentId();
@@ -131,6 +132,7 @@ class ComponentArrayBase
 {
 public:
     virtual ~ComponentArrayBase() = default;
+    virtual void RemoveComponent(Entity e) = 0;
 };
 
 template<typename T>
@@ -171,8 +173,9 @@ Scene::CreateEntity()
 void
 Scene::DestroyEntity(Entity e)
 {
+    // TODO remove all of entity's components
+    cm->RemoveAllComponents(e);
     em->DestroyEntity(e);
-    // TODO remove all of entity's components too
 }
 
 template<typename T> void
@@ -394,6 +397,14 @@ ComponentManager::RemoveComponent(Entity e)
 {
     ComponentArray<T>* ca = GetComponentArray<T>();
     ca->RemoveComponent(e);
+}
+
+void
+ComponentManager::RemoveAllComponents(Entity e)
+{
+    // this is not the cleanest
+    for (auto& vt : ca_pool)
+        if (vt.second->HasComponent(e)) vt.second->RemoveComponent(e);    
 }
 
 template<typename T> T&
