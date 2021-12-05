@@ -7,106 +7,124 @@
 #include "../math/vec.h"
 #include "physicsbody.h"
 
+class ColData;
+class BoxColData;
+class SphereColData;
+
 struct Collider {
-    std::unique_ptr<ColData> data;
+    // TODO try getting this to work with unique ptr
+    std::shared_ptr<ColData> data;
     bool isTrigger = false;
 };
 
-struct CollisionPoints {
-    vec2 point_a;
-    vec2 point_b;
+struct CollisionData {
+    vec2 normal; // vector with tail at a and tip at b
+    float depth = 0.0f;
     bool isCollision = false;
 };
 
 struct Collision {
     Entity a;
     Entity b;
-    CollisionPoints points;
+    CollisionData col_data;
 };
+
+CollisionData ColTestBoxVBox(const BoxColData* a_col, const Transform& a_trans, const BoxColData* b_col, const Transform& b_trans);
+// either write a ColTestSphereVBox function or just use the negative of the normal
+CollisionData ColTestBoxVSphere(const BoxColData* a_col, const Transform& a_trans, const SphereColData* b_col, const Transform& b_trans);
+CollisionData ColTestSphereVSphere(const SphereColData* a_col, const Transform& a_trans, const SphereColData* b_col, const Transform& b_trans);
 
 class ColData
 {
 public:
-    ColData();
     virtual ~ColData() = default;
-    virtual CollisionPoints CheckCollide(const Transform& trans, const ColData* other_col, const Transform& other_trans) = 0;
-    virtual CollisionPoints CheckCollide(const Transform& trans, const BoxColData* other_col, const Transform& other_trans) = 0;
-    virtual CollisionPoints CheckCollide(const Transform& trans, const SphereColData* other_col, const Transform& other_trans) = 0;
+    virtual CollisionData CheckCollide(const Transform& trans, const ColData* other_col, const Transform& other_trans) const = 0;
+    virtual CollisionData CheckCollide(const Transform& trans, const BoxColData* other_col, const Transform& other_trans) const = 0;
+    virtual CollisionData CheckCollide(const Transform& trans, const SphereColData* other_col, const Transform& other_trans) const = 0;
 };
 
 class BoxColData : public ColData
 {
+public:
     vec2 tl; // top left (0,0)
     vec2 br; // bottom right (1,1)
-public:
     BoxColData(const vec2& tl, const vec2& br): ColData{}, tl{tl}, br{br} {}
     ~BoxColData() {};
-    CollisionPoints CheckCollide(const Transform& trans, const ColData* other_col, const Transform& other_trans) override {
-        return other_col->TestCollider(other_trans, this, trans);
+    CollisionData CheckCollide(const Transform& trans, const ColData* other_col, const Transform& other_trans) const override {
+        return other_col->CheckCollide(other_trans, this, trans);
     }
-    CollisionPoints CheckCollide(const Transform& trans, const BoxColData* other_col, const Transform& other_trans) override {
+    CollisionData CheckCollide(const Transform& trans, const BoxColData* other_col, const Transform& other_trans) const override {
+        return ColTestBoxVBox(this, trans, other_col, other_trans);
     }
-    CollisionPoints CheckCollide(const Transform& trans, const SphereColData* other_col, const Transform& other_trans) override {
+    CollisionData CheckCollide(const Transform& trans, const SphereColData* other_col, const Transform& other_trans) const override {
     }
 };
 
 class SphereColData : public ColData
 {
+public:
     float radius;
     vec2 pos;
-public:
     SphereColData(float radius, const vec2& pos): ColData{}, radius{radius}, pos{pos} {}
     ~SphereColData() {};
-    CollisionPoints CheckCollide(const Transform& trans, const ColData* other_col, const Transform& other_trans) override {
-        return other_col->TestCollider(other_trans, this, trans);
+    CollisionData CheckCollide(const Transform& trans, const ColData* other_col, const Transform& other_trans) const override {
+        return other_col->CheckCollide(other_trans, this, trans);
     }
-    CollisionPoints CheckCollide(const Transform& trans, const BoxColData* other_col, const Transform& other_trans) override {
+    CollisionData CheckCollide(const Transform& trans, const BoxColData* other_col, const Transform& other_trans) const override {
     }
-    CollisionPoints CheckCollide(const Transform& trans, const SphereColData* other_col, const Transform& other_trans) override {
+    CollisionData CheckCollide(const Transform& trans, const SphereColData* other_col, const Transform& other_trans) const override {
+        return ColTestSphereVSphere(this, trans, other_col, other_trans);
     }
 };
 
-CollisionPoints ColTestBoxVBox(const ColliderBox& a, const ColliderBox& b);
-CollisionPoints ColTestBoxVSphere(const ColliderBox& a, const ColliderSphere& b);
-CollisionPoints ColTestSphereVSphere(const ColliderSphere& a, const ColliderSphere& b);
-
-class CollisionSystem : public System
+class ColliderSystem : public System
 {
 public:
-    CollisionSystem(Scene& scene);
-    ~CollisionSystem();
+    ColliderSystem(Scene& scene);
+    ~ColliderSystem();
     void BeforeUpdate() override;
     void OnUpdate() override;
     void AfterUpdate() override;
 };
 
-CollisionSystem::CollisionSystem(Scene& scene): System{scene} {}
-CollisionSystem::~CollisionSystem() {}
+ColliderSystem::ColliderSystem(Scene& scene): System{scene} {}
+ColliderSystem::~ColliderSystem() {}
 
 void
-CollisionSystem::BeforeUpdate()
+ColliderSystem::BeforeUpdate()
 {
 }
 
 void
-CollisionSystem::OnUpdate()
+ColliderSystem::OnUpdate()
 {
     // find all possible collisions
     for (auto& e1 : scene.MakeEntityView<Transform,PhysicsBody,Collider>()) {
         Collider& e1_col = scene.GetComponent<Collider>(e1);
+        Transform& e1_trans = scene.GetComponent<Transform>(e1);
 
         for (auto& e2 : scene.MakeEntityView<Transform,PhysicsBody,Collider>()) {
             if (e1 == e2) break;
 
             Collider& e2_col = scene.GetComponent<Collider>(e2);
+            Transform& e2_trans = scene.GetComponent<Transform>(e2);
+
+            CollisionData col_data = e1_col.data->CheckCollide(e1_trans, e2_col.data.get(), e1_trans);
+            if (col_data.isCollision) {
+                /* std::cout << "COLLISION!!! =-=-=-=-=\n"; */
+                /* std::cout << "e1: " << e1; */
+                /* std::cout << "e2: " << e2; */
+                /* std::cout << "normal: " << col_data.normal; */
+                /* std::cout << "depth: " << col_data.depth; */
+            }
         }
     }
 }
 
-void CollisionSystem::AfterUpdate() {}
+void ColliderSystem::AfterUpdate() {}
 
 
-CollisionPoints
+CollisionData
 ColTestBoxVBox(const BoxColData* a_col, const Transform& a_trans, const BoxColData* b_col, const Transform& b_trans)
 {
     /* return ( */
@@ -118,17 +136,19 @@ ColTestBoxVBox(const BoxColData* a_col, const Transform& a_trans, const BoxColDa
     return {.isCollision = false};
 }
 
-/* CollisionPoints */
-/* ColTestBoxVSphere(const Transform& a_trans, const Collider& a_col, const Transform& b_trans, const Collider& b_col) */
-/* { */
-/*     return false; */
-/* } */
-
-CollisionPoints
-ColTestSphereVSphere(const BoxColData* a_col, const Transform& a_trans, const BoxColData* b_col, const Transform& b_trans)
+CollisionData
+ColTestBoxVSphere(const BoxColData* a_col, const Transform& a_trans, const SphereColData* b_col, const Transform& b_trans)
 {
-    if (((a.pos+a_trans.pos)-(b.pos+b_trans.pos)).magnitude() <= a.radius+b.radius) {
-        return {.isCollision = true};
+    return {.isCollision = false};
+}
+
+CollisionData
+ColTestSphereVSphere(const SphereColData* a_col, const Transform& a_trans, const SphereColData* b_col, const Transform& b_trans)
+{
+    vec2 diff = (b_col->pos+b_trans.pos)-(a_col->pos+a_trans.pos);
+    float depth = (a_col->radius+b_col->radius)-diff.magnitude();
+    if (depth > 0) {
+        return {.normal = vec2::normalize(diff), .depth = depth, .isCollision = true};
     }
     return {.isCollision = false};
 }

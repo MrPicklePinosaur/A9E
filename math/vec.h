@@ -10,13 +10,16 @@ struct vec2 {
 
     float magnitude();
     vec2& operator+=(const vec2& other);
+    vec2& operator-=(const vec2& other);
     vec2& operator*=(float s);
     vec2& operator/=(float s);
     friend vec2 operator+(vec2 l, const vec2& r);
+    friend vec2 operator-(vec2 l, const vec2& r);
     friend vec2 operator*(vec2 l, float s);
     friend vec2 operator/(vec2 l, float s);
 
     static vec2 zero();
+    static vec2 normalize(vec2 v);
 };
 std::ostream& operator<<(std::ostream& os, const vec2& v);
 
@@ -32,6 +35,14 @@ vec2::operator+=(const vec2& other)
 {
     x += other.x;
     y += other.y;
+    return *this;
+}
+
+vec2&
+vec2::operator-=(const vec2& other)
+{
+    x -= other.x;
+    y -= other.y;
     return *this;
 }
 
@@ -53,6 +64,13 @@ vec2
 operator+(vec2 l, const vec2& r)
 {
     l += r;
+    return l;
+}
+
+vec2
+operator-(vec2 l, const vec2& r)
+{
+    l -= r;
     return l;
 }
 
@@ -83,4 +101,9 @@ vec2::zero()
     return vec2{};
 }
 
+vec2
+vec2::normalize(vec2 v)
+{
+    return v/v.magnitude();    
+}
 #endif // __VEC_H__

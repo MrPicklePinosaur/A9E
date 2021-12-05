@@ -11,6 +11,7 @@
 #include "components/physicsbody.h"
 #include "components/render.h"
 #include "components/ai.h"
+#include "components/collider.h"
 
 int
 main(int argc, char** argv)
@@ -20,25 +21,40 @@ main(int argc, char** argv)
     RendererSystem render_system{scene};
     AISystem ai_system{scene};
     PhysicsSystem physics_system{scene};
+    ColliderSystem collision_system{scene};
 
     RenderBitmap bitmap{
         {{'A',0,0},{'B',1,0},{'C',0,1},{'D',1,1}}
     };
 
-    for (int i = 0; i < 1; ++i) {
+    {
         Entity e = scene.CreateEntity();
-        Transform t{{2, 2}};
+        Transform t{{2, 30}};
         Render r{RenderType_Bitmap, bitmap};
-        PhysicsBody pb;
+        PhysicsBody pb{.useGravity = false};
+        Collider c{.data = std::make_shared<SphereColData>(1.0f, vec2::zero())};
         scene.AddComponent<Transform>(e, t);
         scene.AddComponent<Render>(e, r);
         scene.AddComponent<PhysicsBody>(e, pb);
+        scene.AddComponent<Collider>(e, c);
+    }
+    {
+        Entity e = scene.CreateEntity();
+        Transform t{{2, 1}};
+        Render r{RenderType_Bitmap, bitmap};
+        PhysicsBody pb;
+        Collider c{.data = std::make_shared<SphereColData>(1.0f, vec2::zero())};
+        scene.AddComponent<Transform>(e, t);
+        scene.AddComponent<Render>(e, r);
+        scene.AddComponent<PhysicsBody>(e, pb);
+        scene.AddComponent<Collider>(e, c);
     }
 
     while(true) {
         std::this_thread::sleep_for(std::chrono::milliseconds(static_cast<int>(TIME_STEP*1000)));
         render_system.Update(); 
         physics_system.Update();
+        collision_system.Update();
         /* ai_system.Update(); */ 
     }
 
