@@ -13,6 +13,7 @@
 #include "components/render.h"
 #include "components/ai.h"
 #include "components/collider.h"
+#include "components/playercontroller.h"
 
 void
 contactCallback(Entity a, Entity b)
@@ -24,10 +25,11 @@ int
 main(int argc, char** argv)
 {
     Scene scene;
-    CursesInput input;
+    CursesInput input_manager;
 
     RendererSystem render_system{scene};
     PhysicsSystem physics_system{scene};
+    PlayerControllerSystem playercontroller_system{scene, input_manager};
     ColliderSystem collision_system{scene};
     collision_system.SetContactCallback(contactCallback);
 
@@ -40,10 +42,12 @@ main(int argc, char** argv)
         Transform t{{2, 20}};
         Render r{RenderType_Bitmap, bitmap};
         PhysicsBody pb{.mass = 10.0f, .useGravity = false};
+        PlayerController ps{.speed = 1.0f};
         Collider c{.data = std::make_shared<SphereColData>(1.0f, vec2::zero())};
         scene.AddComponent<Transform>(e, t);
         scene.AddComponent<Render>(e, r);
         scene.AddComponent<PhysicsBody>(e, pb);
+        scene.AddComponent<PlayerController>(e, ps);
         scene.AddComponent<Collider>(e, c);
     }
     {
@@ -62,7 +66,10 @@ main(int argc, char** argv)
         std::this_thread::sleep_for(std::chrono::milliseconds(static_cast<int>(TIME_STEP*1000)));
         render_system.Update(); 
         physics_system.Update();
+        playercontroller_system.Update();
         collision_system.Update();
+
+        input_manager.ClearKeyMap();
     }
 
     return 0;
