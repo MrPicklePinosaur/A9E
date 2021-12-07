@@ -3,15 +3,15 @@
 #include <thread>
 #include <iostream>
 
-#include "input.h"
+#include "inputer.h"
 
-CursesInput::CursesInput():
-    Input{}, listen_thread{std::make_unique<std::thread>(&CursesInput::ListenInput, this)} {}
+CursesInputer::CursesInputer():
+    Inputer{}, listen_thread{std::make_unique<std::thread>(&CursesInputer::ListenInputer, this)} {}
 
-CursesInput::~CursesInput() {}
+CursesInputer::~CursesInputer() {}
 
 void
-CursesInput::ListenInput()
+CursesInputer::ListenInputer()
 {
     while (true) {
 
@@ -24,19 +24,19 @@ CursesInput::ListenInput()
 }
 
 bool
-CursesInput::GetKeyDown(char c)
+CursesInputer::GetKeyDown(char c)
 {
     return key_map.test(static_cast<size_t>(c));
 }
 
 void
-CursesInput::ClearKeyMap()
+CursesInputer::ClearKeyMap()
 {
     key_map.reset();
 }
 
 void
-CursesInput::SetKeyDown(char c)
+CursesInputer::SetKeyDown(char c)
 {
     key_map.set(static_cast<size_t>(c));
 }

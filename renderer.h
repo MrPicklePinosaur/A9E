@@ -6,23 +6,37 @@
 #include <ncurses.h>
 #include "window.h"
 
-class CursesRenderer
+class Renderer
+{
+public:
+    virtual ~Renderer() {}
+    virtual void DrawChar(char c, int x, int y) = 0;
+    virtual void DrawBox(char c, int x, int y, int w, int h) = 0;
+    virtual void WriteStatus(const std::string& s, int line) = 0;
+    virtual void RefreshGameScreen() = 0;
+    virtual void RefreshStatusScreen() = 0;
+    virtual void DrawGameScreen() = 0;
+    virtual void DrawStatusScreen() = 0;
+    virtual void ClearGameScreen() = 0;
+    virtual void ClearStatusScreen() = 0;
+};
+
+class CursesRenderer final : public Renderer
 {
     std::unique_ptr<Window> game_win;
     std::unique_ptr<Window> status_win;
-
 public:
     CursesRenderer();
     ~CursesRenderer();
-    void DrawChar(char c, int x, int y);
-    void DrawBox(char c, int x, int y, int w, int h);
-    void WriteStatus(const std::string& s, int line);
-    void RefreshGameScreen();
-    void RefreshStatusScreen();
-    void DrawGameScreen();
-    void DrawStatusScreen();
-    void ClearGameScreen();
-    void ClearStatusScreen();
+    void DrawChar(char c, int x, int y) override;
+    void DrawBox(char c, int x, int y, int w, int h) override;
+    void WriteStatus(const std::string& s, int line) override;
+    void RefreshGameScreen() override;
+    void RefreshStatusScreen() override;
+    void DrawGameScreen() override;
+    void DrawStatusScreen() override;
+    void ClearGameScreen() override;
+    void ClearStatusScreen() override;
 private:
     void CursesInit();
     void CursesExit();

@@ -2,7 +2,7 @@
 #define __PLAYERCONTROLLER_H__
 
 #include "../ecs.h"
-#include "../input.h"
+#include "../inputer.h"
 
 struct PlayerController {
     float speed;
@@ -10,16 +10,15 @@ struct PlayerController {
 
 class PlayerControllerSystem : public System
 {
-    CursesInput& input_manager; // TODO this is temp, move this to scene later
 public:
-    PlayerControllerSystem(Scene& scene, CursesInput& input_manager);
+    PlayerControllerSystem(Scene& scene);
     ~PlayerControllerSystem();
     void BeforeUpdate() override;
     void OnUpdate() override;
     void AfterUpdate() override;
 };
 
-PlayerControllerSystem::PlayerControllerSystem(Scene& scene, CursesInput& input_manager): System{scene}, input_manager{input_manager} {}
+PlayerControllerSystem::PlayerControllerSystem(Scene& scene): System{scene} {}
 PlayerControllerSystem::~PlayerControllerSystem() {}
 
 void PlayerControllerSystem::BeforeUpdate() {}
@@ -27,14 +26,16 @@ void PlayerControllerSystem::BeforeUpdate() {}
 void
 PlayerControllerSystem::OnUpdate()
 {
+    Inputer* inputer = scene.GetInputer();
+
     for (auto& e : scene.MakeEntityView<Transform,PlayerController>()) {
         Transform& transform = scene.GetComponent<Transform>(e);
         PlayerController& player_controller = scene.GetComponent<PlayerController>(e);
 
-        if (input_manager.GetKeyDown('a')) transform.pos.x -= player_controller.speed;
-        if (input_manager.GetKeyDown('d')) transform.pos.x += player_controller.speed;
-        if (input_manager.GetKeyDown('w')) transform.pos.y -= player_controller.speed;
-        if (input_manager.GetKeyDown('s')) transform.pos.y += player_controller.speed;
+        if (inputer->GetKeyDown('a')) transform.pos.x -= player_controller.speed;
+        if (inputer->GetKeyDown('d')) transform.pos.x += player_controller.speed;
+        if (inputer->GetKeyDown('w')) transform.pos.y -= player_controller.speed;
+        if (inputer->GetKeyDown('s')) transform.pos.y += player_controller.speed;
     }
 }
 

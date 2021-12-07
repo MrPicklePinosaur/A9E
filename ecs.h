@@ -26,11 +26,19 @@ class EntityManager;
 class SystemManager;
 class EntityView;
 
+class Renderer;
+class CursesRenderer;
+
+class Inputer;
+class CursesInputer;
+
 class Scene
 {
     std::unique_ptr<ComponentManager> cm;
     std::unique_ptr<EntityManager> em;
     std::unique_ptr<SystemManager> sm;
+    std::unique_ptr<Renderer> renderer;
+    std::unique_ptr<Inputer> inputer;
 public:
     Scene();
     ~Scene();
@@ -42,6 +50,8 @@ public:
     template<typename T> bool HasComponent(Entity e);
     template<typename... ComponentIds> EntityView MakeEntityView();
     template<typename T> ComponentId GetComponentId();
+    Renderer* GetRenderer() { return renderer.get(); }
+    Inputer* GetInputer() { return inputer.get(); }
     void Debug();
 };
 
@@ -161,7 +171,9 @@ public:
 Scene::Scene():
     cm{std::make_unique<ComponentManager>(*this)},
     em{std::make_unique<EntityManager>(*this)},
-    sm{std::make_unique<SystemManager>(*this)} {}
+    sm{std::make_unique<SystemManager>(*this)},
+    renderer{std::make_unique<CursesRenderer>()},
+    inputer{std::make_unique<CursesInputer>()} {}
 
 Scene::~Scene() {}
 

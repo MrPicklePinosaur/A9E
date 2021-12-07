@@ -7,7 +7,7 @@
 #include "window.h"
 #include "config.h"
 
-CursesRenderer::CursesRenderer()
+CursesRenderer::CursesRenderer(): Renderer{}
 {
     CursesInit();
 

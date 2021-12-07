@@ -6,7 +6,7 @@
 
 #include "config.h"
 #include "renderer.h"
-#include "input.h"
+#include "inputer.h"
 #include "ecs.h"
 #include "components/transform.h"
 #include "components/physicsbody.h"
@@ -25,11 +25,11 @@ int
 main(int argc, char** argv)
 {
     Scene scene;
-    CursesInput input_manager;
+    Inputer* inputer = scene.GetInputer();
 
     RendererSystem render_system{scene};
     PhysicsSystem physics_system{scene};
-    PlayerControllerSystem playercontroller_system{scene, input_manager};
+    PlayerControllerSystem playercontroller_system{scene};
     ColliderSystem collision_system{scene};
     collision_system.SetContactCallback(contactCallback);
 
@@ -69,7 +69,7 @@ main(int argc, char** argv)
         playercontroller_system.Update();
         collision_system.Update();
 
-        input_manager.ClearKeyMap();
+        inputer->ClearKeyMap();
     }
 
     return 0;

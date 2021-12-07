@@ -1,29 +1,29 @@
-#ifndef __INPUT_H__
-#define __INPUT_H__
+#ifndef __INPUTER_H__
+#define __INPUTER_H__
 
 #include <memory>
 #include <thread>
 #include <bitset>
 
-class Input
+class Inputer
 {
 public:
-    virtual ~Input() {}
+    virtual ~Inputer() {}
     virtual bool GetKeyDown(char c) = 0;
     virtual void ClearKeyMap() = 0;
 };
 
-class CursesInput final : Input
+class CursesInputer final : public Inputer
 {
     std::unique_ptr<std::thread> listen_thread;
     std::bitset<256> key_map;
 public:
-    CursesInput();
-    ~CursesInput();
+    CursesInputer();
+    ~CursesInputer();
     bool GetKeyDown(char c) override;
     void ClearKeyMap() override;
 private:
-    void ListenInput();
+    void ListenInputer();
     void SetKeyDown(char c);
 };
 
