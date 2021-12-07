@@ -133,6 +133,7 @@ class ComponentArrayBase
 public:
     virtual ~ComponentArrayBase() = default;
     virtual void RemoveComponent(Entity e) = 0;
+    virtual bool HasComponent(Entity e) = 0;
 };
 
 template<typename T>

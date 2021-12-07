@@ -14,6 +14,12 @@
 #include "components/ai.h"
 #include "components/collider.h"
 
+void
+contactCallback(Entity a, Entity b)
+{
+    /* std::cout << "COLLISION BETWEEN " << a << " AND " << b << std::endl; */
+}
+
 int
 main(int argc, char** argv)
 {
@@ -23,6 +29,7 @@ main(int argc, char** argv)
     RendererSystem render_system{scene};
     PhysicsSystem physics_system{scene};
     ColliderSystem collision_system{scene};
+    collision_system.SetContactCallback(contactCallback);
 
     RenderBitmap bitmap{
         {{'A',0,0},{'B',1,0},{'C',0,1},{'D',1,1}}
