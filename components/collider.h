@@ -129,6 +129,16 @@ ColliderSystem::OnUpdate()
     for (auto& c : collisions) {
         PhysicsBody& pb_a = scene.GetComponent<PhysicsBody>(c.a);
         PhysicsBody& pb_b = scene.GetComponent<PhysicsBody>(c.b);
+
+        float e = 1.0f;
+        vec2 rel = pb_b.velocity - pb_a.velocity;
+        float rel_normal = rel.dot(c.collision_data.normal);
+        if (rel_normal > 0.0f) continue;
+
+        vec2 impulse = c.collision_data.normal*-1*(1+e)*rel_normal/(1/pb_a.mass + 1/pb_b.mass);
+
+        pb_a.velocity -= impulse/pb_a.mass;
+        pb_b.velocity += impulse/pb_b.mass;
     }
 
     // call the callback for each collision

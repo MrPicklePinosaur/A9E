@@ -10,6 +10,7 @@ struct vec2 {
 
     float magnitude();
     float dot(const vec2& other);
+    vec2 normalize();
     vec2& operator+=(const vec2& other);
     vec2& operator-=(const vec2& other);
     vec2& operator*=(float s);
@@ -35,6 +36,12 @@ float
 vec2::dot(const vec2& other)
 {
     return x*other.x+y*other.y;
+}
+
+vec2
+vec2::normalize()
+{
+    return vec2::normalize(*this);
 }
 
 vec2&

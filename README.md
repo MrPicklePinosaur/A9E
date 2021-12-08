@@ -12,12 +12,11 @@ $ make
 - [x] entity component system
 - [ ] color
 - [x] better way of assigning entity ids
-- [ ] user input
+- [x] user input
 - [x] simple physics
-- [ ] collision system
+- [x] collision system
 - [ ] collision mask
 - [ ] error/exception handling
-- [ ] component array store pointers?
 - [ ] logger that can either do to file or the ncurses stauts 'console'
 - [ ] ability to create and destroy entities in update loop (might need a create/destroy queue)
 - [ ] package for linux distros
@@ -29,4 +28,4 @@ some resources that were used when writing this project
 - [another ECS design](https://www.david-colson.com/2020/02/09/making-a-simple-ecs.html)
 - [physics engine in 5 min](https://www.youtube.com/watch?v=-_IspRG548E)
 - [impulse resolution and collision detection](https://gamedevelopment.tutsplus.com/tutorials/how-to-create-a-custom-2d-physics-engine-the-basics-and-impulse-resolution--gamedev-6331)
-
+- [paper on impulse resolution](https://research.ncl.ac.uk/game/mastersdegree/gametechnologies/physicstutorials/5collisionresponse/Physics%20-%20Collision%20Response.pdf)
