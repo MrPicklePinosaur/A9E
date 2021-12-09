@@ -64,6 +64,7 @@ vec2&
 vec2::operator*=(float s)
 {
     x *= s;
+    y *= s;
     return *this;
 }
 
@@ -71,6 +72,7 @@ vec2&
 vec2::operator/=(float s)
 {
     x /= s;
+    y /= s;
     return *this;
 }
 

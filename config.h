@@ -8,6 +8,9 @@
 
 // in milli seconds
 const float TIME_STEP = 0.005f;
-const float GRAVITY = 0.001f;
+const float GRAVITY = 9.0f;
+
+const float CORRECTION_PERCENT = 1.0f;
+const float SLOP = 0.01f;
 
 #endif // __CONFIG_H__

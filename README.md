@@ -11,6 +11,7 @@ $ make
 ## TODO
 - [x] entity component system
 - [ ] color
+- [ ] utf8 support
 - [x] better way of assigning entity ids
 - [x] user input
 - [x] simple physics
@@ -19,6 +20,7 @@ $ make
 - [ ] error/exception handling
 - [ ] logger that can either do to file or the ncurses stauts 'console'
 - [ ] ability to create and destroy entities in update loop (might need a create/destroy queue)
+- [ ] load bitmaps from file
 - [ ] package for linux distros
 
 ## RESOURCES

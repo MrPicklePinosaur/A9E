@@ -2,9 +2,11 @@
 #define __COLLIDER_H__
 
 #include <memory>
+#include <algorithm>
 #include <variant>
 #include "../ecs.h"
 #include "../math/vec.h"
+#include "../config.h"
 #include "physicsbody.h"
 
 class ColData;
@@ -129,16 +131,23 @@ ColliderSystem::OnUpdate()
     for (auto& c : collisions) {
         PhysicsBody& pb_a = scene.GetComponent<PhysicsBody>(c.a);
         PhysicsBody& pb_b = scene.GetComponent<PhysicsBody>(c.b);
+        Transform& trans_a = scene.GetComponent<Transform>(c.a);
+        Transform& trans_b = scene.GetComponent<Transform>(c.b);
 
         float e = 1.0f;
         vec2 rel = pb_b.velocity - pb_a.velocity;
         float rel_normal = rel.dot(c.collision_data.normal);
-        if (rel_normal > 0.0f) continue;
+        if (rel_normal >= 0.0f) continue;
 
-        vec2 impulse = c.collision_data.normal*-1*(1+e)*rel_normal/(1/pb_a.mass + 1/pb_b.mass);
+        vec2 impulse = c.collision_data.normal*-1*(1.0f+e)*rel_normal/(1/pb_a.mass + 1/pb_b.mass);
 
         pb_a.velocity -= impulse/pb_a.mass;
         pb_b.velocity += impulse/pb_b.mass;
+
+        // correct position based on penetrations
+        vec2 correction = c.collision_data.normal * std::max(c.collision_data.depth-SLOP, 0.0f) * CORRECTION_PERCENT / (1/pb_a.mass + 1/pb_b.mass);
+        trans_a.pos -= correction * 1/pb_a.mass;
+        trans_b.pos += correction * 1/pb_b.mass;
     }
 
     // call the callback for each collision
