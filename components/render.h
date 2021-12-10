@@ -1,5 +1,5 @@
-#ifndef __RENDER_COMPONENT_H__
-#define __RENDER_COMPONENT_H__
+#ifndef __RENDER_H__
+#define __RENDER_H__
 
 #include <variant>
 #include <vector>
@@ -95,4 +95,4 @@ void RendererSystem::AfterUpdate()
     r->RefreshGameScreen();
 }
 
-#endif // __RENDER_COMPONENT_H__
+#endif // __RENDER_H__

@@ -1,4 +1,3 @@
-
 #ifndef __RENDERER_H__
 #define __RENDERER_H__
 
@@ -9,6 +8,7 @@
 class Renderer
 {
 public:
+    Renderer() {}
     virtual ~Renderer() {}
     virtual void DrawChar(char c, int x, int y) = 0;
     virtual void DrawBox(char c, int x, int y, int w, int h) = 0;

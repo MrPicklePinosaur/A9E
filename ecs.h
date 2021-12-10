@@ -10,6 +10,9 @@
 #include <queue>
 #include <map>
 
+#include "renderer.h"
+#include "inputer.h"
+
 const int MAX_COMPONENTS = 32;
 const int MAX_ENTITIES = 1028; // if we switch to using vector instead of array we can have this be uncapped
 
@@ -25,12 +28,6 @@ class ComponentManager;
 class EntityManager;
 class SystemManager;
 class EntityView;
-
-class Renderer;
-class CursesRenderer;
-
-class Inputer;
-class CursesInputer;
 
 class Scene
 {

@@ -11,7 +11,6 @@
 #include "components/transform.h"
 #include "components/physicsbody.h"
 #include "components/render.h"
-#include "components/ai.h"
 #include "components/collider.h"
 #include "components/playercontroller.h"
 
@@ -44,9 +43,10 @@ main(int argc, char** argv)
         Entity e = scene.CreateEntity();
         Transform t{{2, 20}};
         Render r{RenderType_Bitmap, bitmap1};
-        PhysicsBody pb{.mass = 5.0f, .useGravity = false, .velocity = {0.0f, -5.0f}};
+        PhysicsBody pb{.mass = 5.0f, .restitution = 1.0f, .useGravity = false, .velocity = {0.0f, -5.0f}};
         PlayerController ps{.speed = 1.0f};
-        Collider c{.data = std::make_shared<SphereColData>(1.0f, vec2::zero())};
+        /* Collider c{.data = std::make_shared<SphereColData>(1.0f)}; */
+        Collider c{.data = std::make_shared<BoxColData>(vec2{0.0f, 0.0f}, vec2{2.0f, 2.0f})};
         scene.AddComponent<Transform>(e, t);
         scene.AddComponent<Render>(e, r);
         scene.AddComponent<PhysicsBody>(e, pb);
@@ -58,7 +58,8 @@ main(int argc, char** argv)
         Transform t{{2, 10}};
         Render r{RenderType_Bitmap, bitmap2};
         PhysicsBody pb{.mass = 5.0f, .useGravity = false, .velocity = {0.0f, 5.0f}};
-        Collider c{.data = std::make_shared<SphereColData>(1.0f, vec2::zero())};
+        /* Collider c{.data = std::make_shared<SphereColData>(1.0f)}; */
+        Collider c{.data = std::make_shared<BoxColData>(vec2{0.0f, 0.0f}, vec2{2.0f, 2.0f})};
         scene.AddComponent<Transform>(e, t);
         scene.AddComponent<Render>(e, r);
         scene.AddComponent<PhysicsBody>(e, pb);

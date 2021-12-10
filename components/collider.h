@@ -3,11 +3,11 @@
 
 #include <memory>
 #include <algorithm>
-#include <variant>
+
+#include "physicsbody.h"
+#include "../config.h"
 #include "../ecs.h"
 #include "../math/vec.h"
-#include "../config.h"
-#include "physicsbody.h"
 
 class ColData;
 class BoxColData;
@@ -67,6 +67,7 @@ class SphereColData : public ColData
 public:
     float radius;
     vec2 pos;
+    SphereColData(float radius): ColData{}, radius{radius}, pos{vec2::zero()} {}
     SphereColData(float radius, const vec2& pos): ColData{}, radius{radius}, pos{pos} {}
     ~SphereColData() {};
     CollisionData CheckCollide(const Transform& trans, const ColData* other_col, const Transform& other_trans) const override {
@@ -121,6 +122,8 @@ ColliderSystem::OnUpdate()
             Collider& e2_col = scene.GetComponent<Collider>(e2);
             Transform& e2_trans = scene.GetComponent<Transform>(e2);
 
+            if (e1_trans.layer != e2_trans.layer) continue;
+
             CollisionData collision_data = e1_col.data->CheckCollide(e1_trans, e2_col.data.get(), e2_trans);
             if (collision_data.isCollision)
                 collisions.push_back(Collision{.a = e1, .b = e2, .collision_data = collision_data});
@@ -133,8 +136,13 @@ ColliderSystem::OnUpdate()
         PhysicsBody& pb_b = scene.GetComponent<PhysicsBody>(c.b);
         Transform& trans_a = scene.GetComponent<Transform>(c.a);
         Transform& trans_b = scene.GetComponent<Transform>(c.b);
+        Collider& col_a = scene.GetComponent<Collider>(c.a);
+        Collider& col_b = scene.GetComponent<Collider>(c.b);
 
-        float e = 1.0f;
+        // no collision response if is trigger (current two triggers are allowed to collide, not sure if good idea)
+        if (col_a.isTrigger || col_b.isTrigger) continue;
+
+        float e = std::min(pb_a.restitution, pb_b.restitution);
         vec2 rel = pb_b.velocity - pb_a.velocity;
         float rel_normal = rel.dot(c.collision_data.normal);
         if (rel_normal >= 0.0f) continue;
@@ -162,13 +170,26 @@ void ColliderSystem::AfterUpdate() {}
 CollisionData
 ColTestBoxVBox(const BoxColData* a_col, const Transform& a_trans, const BoxColData* b_col, const Transform& b_trans)
 {
-    /* return ( */
-    /*     a.tl.x < b.br.x && */
-    /*     a.br.x < b.tl.x && */
-    /*     a.tl.y < b.br.y && */
-    /*     a.br.y < b.tl.y */
-    /* ); */
-    return {.isCollision = false};
+    // collision testing using seperating axis theorem (SAT)
+    // simplified version: assumes that boxes cannot be rotated
+    float dx = b_trans.pos.x - a_trans.pos.x;
+    float x_overlap = std::abs(a_col->br.x-a_col->tl.x)/2+std::abs(b_col->br.x-b_col->tl.x)/2-std::abs(dx);
+    if (x_overlap <= 0.0f) return {.isCollision = false};
+
+    float dy = b_trans.pos.y - a_trans.pos.y;
+    float y_overlap = std::abs(a_col->tl.y-a_col->br.y)/2+std::abs(b_col->tl.y-b_col->br.y)/2-std::abs(dy);
+    if (y_overlap <= 0.0f) return {.isCollision = false};
+
+    CollisionData c_data = {.isCollision = true};
+    if (x_overlap <= y_overlap) {
+        c_data.depth = x_overlap;
+        c_data.normal = vec2{(dx > 0.0f) ? 1.0f : -1.0f, 0.0f};
+    } else {
+        c_data.depth = y_overlap;
+        c_data.normal = vec2{0.0f, (dy > 0.0f) ? 1.0f : -1.0f};
+    }
+
+    return c_data;
 }
 
 CollisionData

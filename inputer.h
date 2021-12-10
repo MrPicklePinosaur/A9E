@@ -27,4 +27,4 @@ private:
     void SetKeyDown(char c);
 };
 
-#endif // __INPUT_H__
+#endif // __INPUTER_H__

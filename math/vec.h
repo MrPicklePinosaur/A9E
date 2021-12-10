@@ -1,5 +1,5 @@
-#ifndef __VEC_H__
-#define __VEC_H__
+#ifndef __MATH_VEC_H__
+#define __MATH_VEC_H__
 
 #include <ostream>
 #include <cmath>
@@ -8,9 +8,9 @@ struct vec2 {
     float x = 0.0f;
     float y = 0.0f;
 
-    float magnitude();
-    float dot(const vec2& other);
-    vec2 normalize();
+    float magnitude() const;
+    float dot(const vec2& other) const;
+    vec2 normalize() const;
     vec2& operator+=(const vec2& other);
     vec2& operator-=(const vec2& other);
     vec2& operator*=(float s);
@@ -22,24 +22,25 @@ struct vec2 {
 
     static vec2 zero();
     static vec2 normalize(vec2 v);
+    static vec2 projection(const vec2& v1, const vec2& v2);
 };
 std::ostream& operator<<(std::ostream& os, const vec2& v);
 
 // try to write this without sqrt
 float
-vec2::magnitude()
+vec2::magnitude() const
 {
     return sqrt(x*x+y*y);
 }
 
 float
-vec2::dot(const vec2& other)
+vec2::dot(const vec2& other) const
 {
     return x*other.x+y*other.y;
 }
 
 vec2
-vec2::normalize()
+vec2::normalize() const
 {
     return vec2::normalize(*this);
 }
@@ -124,4 +125,12 @@ vec2::normalize(vec2 v)
     if (mag == 0) return vec2::zero();
     return v/mag;
 }
-#endif // __VEC_H__
+
+vec2
+vec2::projection(const vec2& v1, const vec2& v2)
+{
+    vec2 v2_unit = v2.normalize();
+    return v2_unit*v1.dot(v2_unit);
+}
+
+#endif // __MATH_VEC_H__
