@@ -82,11 +82,11 @@ public:
 
 class ColliderSystem : public System
 {
-    void (*contactCallback)(Entity, Entity) = nullptr;
+    void (*contactCallback)(Scene&, Entity, Entity) = nullptr;
 public:
     ColliderSystem(Scene& scene);
     ~ColliderSystem();
-    void SetContactCallback(void (*contactCallback)(Entity, Entity));
+    void SetContactCallback(void (*contactCallback)(Scene&, Entity, Entity));
     void BeforeUpdate() override;
     void OnUpdate() override;
     void AfterUpdate() override;
@@ -96,7 +96,7 @@ ColliderSystem::ColliderSystem(Scene& scene): System{scene} {}
 ColliderSystem::~ColliderSystem() {}
 
 void
-ColliderSystem::SetContactCallback(void (*contactCallback)(Entity, Entity))
+ColliderSystem::SetContactCallback(void (*contactCallback)(Scene&, Entity, Entity))
 {
     this->contactCallback = contactCallback;
 }
@@ -160,7 +160,7 @@ ColliderSystem::OnUpdate()
 
     // call the callback for each collision
     if (contactCallback != nullptr) {
-        for (auto& c : collisions) contactCallback(c.a, c.b);
+        for (auto& c : collisions) contactCallback(scene, c.a, c.b);
     }
 
 }

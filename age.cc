@@ -4,6 +4,8 @@
 #include <chrono>
 #include <thread>
 
+#include <cstdlib>
+
 #include "config.h"
 #include "renderer.h"
 #include "inputer.h"
@@ -15,9 +17,10 @@
 #include "components/playercontroller.h"
 
 void
-contactCallback(Entity a, Entity b)
+contactCallback(Scene& scene, Entity a, Entity b)
 {
     /* std::cout << "COLLISION BETWEEN " << a << " AND " << b << std::endl; */
+    /* scene.DestroyEntity(a); */
 }
 
 int
@@ -42,24 +45,29 @@ main(int argc, char** argv)
     {
         Entity e = scene.CreateEntity();
         Transform t{{2, 20}};
-        Render r{RenderType_Bitmap, bitmap1};
-        PhysicsBody pb{.mass = 5.0f, .restitution = 1.0f, .useGravity = false, .velocity = {0.0f, -5.0f}};
+        Render r{RenderType_Box, RenderBox{'A', 70, 5}};
+        PhysicsBody pb{.mass = 5000.0f, .restitution = 1.0f, .isSimulated = false, .useGravity = false, .velocity = {0.0f, 0.0f}};
         PlayerController ps{.speed = 1.0f};
         /* Collider c{.data = std::make_shared<SphereColData>(1.0f)}; */
-        Collider c{.data = std::make_shared<BoxColData>(vec2{0.0f, 0.0f}, vec2{2.0f, 2.0f})};
+        Collider c{.data = std::make_shared<BoxColData>(vec2{0.0f, 0.0f}, vec2{100.0f, 5.0f})};
         scene.AddComponent<Transform>(e, t);
         scene.AddComponent<Render>(e, r);
         scene.AddComponent<PhysicsBody>(e, pb);
         scene.AddComponent<PlayerController>(e, ps);
         scene.AddComponent<Collider>(e, c);
     }
+    for (int i = 0; i < 20; ++i)
     {
         Entity e = scene.CreateEntity();
-        Transform t{{2, 10}};
-        Render r{RenderType_Bitmap, bitmap2};
-        PhysicsBody pb{.mass = 5.0f, .useGravity = false, .velocity = {0.0f, 5.0f}};
+        int rx = rand() % 20 + 30;
+        int ry = rand() % 10;
+        int rv = rand() % 20 - 10;
+        Transform t{{rx, ry}};
+        /* Render r{RenderType_Bitmap, bitmap2}; */
+        Render r{RenderType_Char, RenderChar{'B'}};
+        PhysicsBody pb{.mass = 1.0f, .restitution = 0.9f, .useGravity = true, .velocity = {rv, 0.0f}};
         /* Collider c{.data = std::make_shared<SphereColData>(1.0f)}; */
-        Collider c{.data = std::make_shared<BoxColData>(vec2{0.0f, 0.0f}, vec2{2.0f, 2.0f})};
+        Collider c{.data = std::make_shared<BoxColData>(vec2{0.0f, 0.0f}, vec2{1.0f, 1.0f})};
         scene.AddComponent<Transform>(e, t);
         scene.AddComponent<Render>(e, r);
         scene.AddComponent<PhysicsBody>(e, pb);
@@ -67,6 +75,7 @@ main(int argc, char** argv)
     }
 
     while(true) {
+        std::chrono::steady_clock::time_point beg_tick = std::chrono::steady_clock::now();
         std::this_thread::sleep_for(std::chrono::milliseconds(static_cast<int>(TIME_STEP*1000.0)));
         playercontroller_system.Update();
         collision_system.Update();
@@ -74,6 +83,8 @@ main(int argc, char** argv)
         render_system.Update(); 
 
         inputer->ClearKeyMap();
+        std::chrono::steady_clock::time_point end_tick = std::chrono::steady_clock::now();
+        scene.delta = std::chrono::duration_cast<std::chrono::nanoseconds>(end_tick-beg_tick).count()/1000000000.0f;
     }
 
     return 0;

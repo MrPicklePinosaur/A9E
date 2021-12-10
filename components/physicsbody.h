@@ -39,11 +39,13 @@ PhysicsSystem::OnUpdate()
         Transform& transform = scene.GetComponent<Transform>(e);
         PhysicsBody& physics_body = scene.GetComponent<PhysicsBody>(e);
 
+        if (!physics_body.isSimulated) continue;
+
         if (physics_body.useGravity)
             physics_body.force.y += (GRAVITY*physics_body.gravityScale)*physics_body.mass;
 
-        physics_body.velocity += (physics_body.force/physics_body.mass)*TIME_STEP;
-        transform.pos += physics_body.velocity*TIME_STEP;
+        physics_body.velocity += (physics_body.force/physics_body.mass)*scene.delta;
+        transform.pos += physics_body.velocity*scene.delta;
 
         physics_body.force = vec2::zero();
     }

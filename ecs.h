@@ -37,6 +37,7 @@ class Scene
     std::unique_ptr<Renderer> renderer;
     std::unique_ptr<Inputer> inputer;
 public:
+    float delta = 0.0f;
     Scene();
     ~Scene();
     Entity CreateEntity();

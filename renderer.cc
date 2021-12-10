@@ -34,9 +34,8 @@ CursesRenderer::DrawChar(char c, int x, int y)
 void
 CursesRenderer::DrawBox(char c, int x, int y, int w, int h)
 {
-    const char* boxline = std::string(w, c).c_str();
     for (int i = 0; i < h; ++i)
-        mvwprintw(game_win->getwin(), y+i, x, boxline);
+        mvwprintw(game_win->getwin(), y+i, x, std::string(w, c).c_str());
 }
 
 void
