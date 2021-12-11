@@ -7,7 +7,7 @@
 #define STATUS_HEIGHT 3
 
 // in milli seconds
-const float TIME_STEP = 0.0005f;
+const float TIME_STEP = 0.05f;
 const float GRAVITY = 9.0f;
 
 const float CORRECTION_PERCENT = 1.0f;

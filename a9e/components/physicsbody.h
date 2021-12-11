@@ -14,6 +14,7 @@ struct PhysicsBody {
     bool isSimulated = true;
     bool useGravity = true;
     vec2 velocity;
+    float maxSpeed = 0.0f; // maxSpeed <= 0 means no max speed
     vec2 force;
 };
 
@@ -45,6 +46,11 @@ PhysicsSystem::OnUpdate()
             physics_body.force.y += (GRAVITY*physics_body.gravityScale)*physics_body.mass;
 
         physics_body.velocity += (physics_body.force/physics_body.mass)*scene.getDelta();
+
+        // clamp max velocity
+        if (physics_body.velocity.magnitude() > physics_body.maxSpeed && physics_body.maxSpeed > 0.0f)
+            physics_body.velocity *= physics_body.maxSpeed/physics_body.velocity.magnitude();
+
         transform.pos += physics_body.velocity*scene.getDelta();
 
         physics_body.force = vec2::zero();
