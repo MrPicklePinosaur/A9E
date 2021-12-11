@@ -1,10 +1,26 @@
 
+#include <vector>
+#include <chrono>
+
 #include "a9e.h"
 #include "components/playercontroller.h"
 #include "components/enemycontroller.h"
 #include "components/global.h"
+#include "components/wave.h"
 #include "spawner.h"
 #include "common.h"
+
+using namespace std::chrono_literals;
+
+const std::vector<Wave> waves = {
+    Wave{
+        .spawns = {SpawnBasicEnemy},
+        .count = 10,
+        .pad = 5s,
+        .stagger = 1s,
+        .spawn_point = {2, 2}
+    }
+};
 
 void
 contactCallback(Scene& scene, Entity a, Entity b)
@@ -24,8 +40,10 @@ main(int argc, char** argv)
     scene.RegisterSystem<ColliderSystem>();
     scene.RegisterSystem<PlayerControllerSystem>();
     scene.RegisterSystem<EnemyControllerSystem>();
+    auto* wave_system = scene.RegisterSystem<WaveSystem>();
     scene.RegisterSystem<GlobalSystem>();
 
+    wave_system->AddWaves(waves);
     scene.setGlobal(GlobalState{});
 
     {
