@@ -1,5 +1,5 @@
-#ifndef __WINDOW_H__
-#define __WINDOW_H__
+#ifndef __A9E_WINDOW_H__
+#define __A9E_WINDOW_H__
 
 #include <ncurses.h>
 
@@ -14,21 +14,4 @@ public:
     WINDOW* getwin();
 };
 
-Window::Window(int h, int w, int y, int x):
-    win{newwin(h, w, y, x)}
-{
-    refresh();
-}
-
-Window::~Window()
-{
-    delwin(win);
-}
-
-WINDOW*
-Window::getwin()
-{
-    return win;
-}
-
-#endif // __WINDOW_H__
+#endif // __A9E_WINDOW_H__

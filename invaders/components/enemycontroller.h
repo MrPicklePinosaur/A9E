@@ -1,8 +1,7 @@
 #ifndef __ENEMYCONTROLLER_H__
 #define __ENEMYCONTROLLER_H__
 
-#include "cstdlib"
-#include "../spawner.h"
+#include "../../a9e/a9e.h"
 
 struct EnemyController {
 
@@ -17,18 +16,5 @@ public:
     void OnUpdate() override;
     void AfterUpdate() override {}
 };
-
-void
-EnemyControllerSystem::OnUpdate()
-{
-    for (auto& e : scene.MakeEntityView<Transform,EnemyController,PhysicsBody>()) {
-        Transform& transform = scene.GetComponent<Transform>(e);
-        EnemyController& enemy_controller = scene.GetComponent<EnemyController>(e);
-        PhysicsBody& physics_body = scene.GetComponent<PhysicsBody>(e);
-
-        if (rand() % 30 == 1) SpawnEnemyBullet(scene, transform.pos);
-        
-    }
-}
 
 #endif // __ENEMYCONTROLLER_H__

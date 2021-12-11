@@ -1,5 +1,5 @@
-#ifndef __TRANSFORM_COMPONENT_H__
-#define __TRANSFORM_COMPONENT_H__
+#ifndef __A9E_TRANSFORM_H__
+#define __A9E_TRANSFORM_H__
 
 #include "../math/vec.h"
 
@@ -8,4 +8,4 @@ struct Transform {
     int layer = 0;
 };
 
-#endif // __TRANSFORM_COMPONENT_H__
+#endif // __A9E_TRANSFORM_H__
