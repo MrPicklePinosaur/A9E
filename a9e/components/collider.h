@@ -2,10 +2,13 @@
 #define __A9E_COLLIDER_H__
 
 #include <memory>
+#include <bitset>
 
 #include "../ecs.h"
 #include "../math/vec.h"
 #include "transform.h"
+
+const int MAX_COLLIDER_TAGS = 32;
 
 class ColData;
 class BoxColData;
@@ -14,6 +17,7 @@ class SphereColData;
 struct Collider {
     // TODO try getting this to work with unique ptr
     std::shared_ptr<ColData> data;
+    std::bitset<MAX_COLLIDER_TAGS> tags;
     bool isTrigger = false;
 };
 
@@ -57,6 +61,7 @@ public:
         return ColTestBoxVBox(this, trans, other_col, other_trans);
     }
     inline CollisionData CheckCollide(const Transform& trans, const SphereColData* other_col, const Transform& other_trans) const override {
+        return CollisionData{.isCollision = false};
     }
 };
 
@@ -72,6 +77,7 @@ public:
         return other_col->CheckCollide(other_trans, this, trans);
     }
     inline CollisionData CheckCollide(const Transform& trans, const BoxColData* other_col, const Transform& other_trans) const override {
+        return CollisionData{.isCollision = false};
     }
     inline CollisionData CheckCollide(const Transform& trans, const SphereColData* other_col, const Transform& other_trans) const override {
         return ColTestSphereVSphere(this, trans, other_col, other_trans);

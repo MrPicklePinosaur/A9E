@@ -41,6 +41,7 @@ RenderSystem::OnUpdate()
                     r->DrawChar(pixel.c, transform.pos.x+pixel.x, transform.pos.y+pixel.y);
                 break;
             }
+            default: { }
         }
     }
 }

@@ -1,7 +1,7 @@
 #ifndef __ENEMYCONTROLLER_H__
 #define __ENEMYCONTROLLER_H__
 
-#include "../../a9e/a9e.h"
+#include "a9e.h"
 
 struct EnemyController {
 

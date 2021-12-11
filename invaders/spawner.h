@@ -1,7 +1,7 @@
 #ifndef __SPAWNER_H__
 #define __SPAWNER_H__
 
-#include "../a9e/a9e.h"
+#include "a9e.h"
 
 void SpawnBasicEnemy(Scene& scene, const vec2& pos);
 void SpawnPlayerBullet(Scene& scene, const vec2& pos);

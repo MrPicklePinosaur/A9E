@@ -1,5 +1,5 @@
 CXX=g++
-CXXFLAGS=-std=c++17 -Wall -MMD -g
+CXXFLAGS=-std=c++17 -Wall -MMD -g -Ia9e
 LIBS=-lncurses -lpthread
 
 A9E_DIR=./a9e

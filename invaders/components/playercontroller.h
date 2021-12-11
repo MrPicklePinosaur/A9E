@@ -1,7 +1,7 @@
 #ifndef __PLAYERCONTROLLER_H__
 #define __PLAYERCONTROLLER_H__
 
-#include "../../a9e/a9e.h"
+#include "a9e.h"
 
 struct PlayerController {
     float speed;

@@ -1,5 +1,5 @@
 
-/* #include "../spawner.h" */
+#include "../spawner.h"
 #include "playercontroller.h"
 
 void
@@ -16,7 +16,7 @@ PlayerControllerSystem::OnUpdate()
         if (inputer->GetKeyDown('d')) physics_body.velocity = vec2{player_controller.speed, 0.0f};
         if (inputer->GetKeyDown('i')) player_controller.autofire = !player_controller.autofire;
         if (inputer->GetKeyDown(' ') || player_controller.autofire) {
-            /* SpawnPlayerBullet(scene, transform.pos+vec2{0.0f, -1.0f}); */
+            SpawnPlayerBullet(scene, transform.pos+vec2{0.0f, -1.0f});
         }
     }
 }
