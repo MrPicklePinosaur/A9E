@@ -93,6 +93,8 @@ void RenderSystem::AfterUpdate()
 {
     r->DrawGameScreen();
     r->RefreshGameScreen();
+    r->DrawStatusScreen();
+    r->RefreshStatusScreen();
 }
 
 #endif // __RENDER_H__

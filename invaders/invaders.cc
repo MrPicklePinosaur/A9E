@@ -2,6 +2,7 @@
 #include "../a9e/a9e.h"
 #include "components/playercontroller.h"
 #include "components/enemycontroller.h"
+#include "components/global.h"
 
 void
 contactCallback(Scene& scene, Entity a, Entity b)
@@ -20,6 +21,9 @@ main(int argc, char** argv)
     scene.RegisterSystem<ColliderSystem>();
     scene.RegisterSystem<PlayerControllerSystem>();
     scene.RegisterSystem<EnemyControllerSystem>();
+    scene.RegisterSystem<GlobalSystem>();
+
+    scene.setGlobal(GlobalState{});
 
     {
         Entity e = scene.CreateEntity();

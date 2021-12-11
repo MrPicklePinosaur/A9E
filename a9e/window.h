@@ -9,7 +9,7 @@ class Window
 protected:
     WINDOW* win;
 public:
-    Window(int w, int h, int y, int x);
+    Window(int h, int w, int y, int x);
     ~Window();
     WINDOW* getwin();
 };

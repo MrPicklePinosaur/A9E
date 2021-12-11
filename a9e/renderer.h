@@ -16,6 +16,7 @@ public:
     virtual void DrawChar(char c, int x, int y) = 0;
     virtual void DrawBox(char c, int x, int y, int w, int h) = 0;
     virtual void WriteStatus(const std::string& s, int line) = 0;
+    virtual void WriteStatus(const std::string& s, int x, int y) = 0;
     virtual void RefreshGameScreen() = 0;
     virtual void RefreshStatusScreen() = 0;
     virtual void DrawGameScreen() = 0;
@@ -34,6 +35,7 @@ public:
     void DrawChar(char c, int x, int y) override;
     void DrawBox(char c, int x, int y, int w, int h) override;
     void WriteStatus(const std::string& s, int line) override;
+    void WriteStatus(const std::string& s, int x, int y) override;
     void RefreshGameScreen() override;
     void RefreshStatusScreen() override;
     void DrawGameScreen() override;
@@ -50,7 +52,7 @@ CursesRenderer::CursesRenderer(): Renderer{}
     CursesInit();
 
     game_win = std::make_unique<Window>(SCREEN_HEIGHT-STATUS_HEIGHT, SCREEN_WIDTH, 0, 0);
-    status_win = std::make_unique<Window>(STATUS_HEIGHT, SCREEN_WIDTH, SCREEN_WIDTH-STATUS_HEIGHT, 0);
+    status_win = std::make_unique<Window>(STATUS_HEIGHT, SCREEN_WIDTH, SCREEN_HEIGHT-STATUS_HEIGHT, 0);
 
     refresh();
 }
@@ -84,6 +86,12 @@ CursesRenderer::WriteStatus(const std::string& s, int line)
     wclrtoeol(status_win->getwin());
 
     mvwprintw(status_win->getwin(), line, 0, s.c_str());
+}
+
+void
+CursesRenderer::WriteStatus(const std::string& s, int x, int y)
+{
+    mvwprintw(status_win->getwin(), y, x, s.c_str());
 }
 
 void
