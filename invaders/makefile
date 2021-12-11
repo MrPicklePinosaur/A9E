@@ -1,8 +1,8 @@
 CXX=g++
 CXXFLAGS=-std=c++17 -Wall -MMD -g
 LIBS=-lncurses -lpthread
-EXEC=age
-OBJECTS=age.o renderer.o inputer.o window.o
+EXEC=invaders
+OBJECTS=invaders.o
 DEPENDS=${OBJECTS:.o=.d}
 
 ${EXEC}: ${OBJECTS}

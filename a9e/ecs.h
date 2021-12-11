@@ -2,6 +2,7 @@
 #define __ECS_H__
 
 #include <iostream>
+#include <chrono>
 #include <cstdint>
 #include <bitset>
 #include <unordered_map>
@@ -12,6 +13,7 @@
 
 #include "renderer.h"
 #include "inputer.h"
+#include "config.h"
 
 const int MAX_COMPONENTS = 32;
 const int MAX_ENTITIES = 1028; // if we switch to using vector instead of array we can have this be uncapped
@@ -36,10 +38,11 @@ class Scene
     std::unique_ptr<SystemManager> sm;
     std::unique_ptr<Renderer> renderer;
     std::unique_ptr<Inputer> inputer;
-public:
     float delta = 0.0f;
+public:
     Scene();
     ~Scene();
+    void Run();
     Entity CreateEntity();
     void DestroyEntity(Entity e);
     template<typename T> void AddComponent(Entity e, const T& component);
@@ -48,8 +51,10 @@ public:
     template<typename T> bool HasComponent(Entity e);
     template<typename... ComponentIds> EntityView MakeEntityView();
     template<typename T> ComponentId GetComponentId();
+    template<typename T> T* RegisterSystem();
     Renderer* GetRenderer() { return renderer.get(); }
     Inputer* GetInputer() { return inputer.get(); }
+    float getDelta() { return delta; }
     void Debug();
 };
 
@@ -101,6 +106,7 @@ public:
     SystemManager(Scene& scene);
     ~SystemManager();
     template<typename T> T* RegisterSystem();
+    void UpdateAll();
     void Debug();
 };
 
@@ -171,9 +177,24 @@ Scene::Scene():
     em{std::make_unique<EntityManager>(*this)},
     sm{std::make_unique<SystemManager>(*this)},
     renderer{std::make_unique<CursesRenderer>()},
-    inputer{std::make_unique<CursesInputer>()} {}
+    inputer{std::make_unique<CursesInputer>()} { }
 
 Scene::~Scene() {}
+
+void
+Scene::Run()
+{
+    while(true) {
+        std::chrono::steady_clock::time_point beg_tick = std::chrono::steady_clock::now();
+        std::this_thread::sleep_for(std::chrono::milliseconds(static_cast<int>(TIME_STEP*1000.0)));
+
+        sm->UpdateAll();
+        inputer->ClearKeyMap();
+
+        std::chrono::steady_clock::time_point end_tick = std::chrono::steady_clock::now();
+        delta = std::chrono::duration_cast<std::chrono::nanoseconds>(end_tick-beg_tick).count()/1000000000.0f;
+    }
+}
 
 Entity
 Scene::CreateEntity()
@@ -226,6 +247,12 @@ Scene::GetComponentId()
     return cm->GetComponentId<T>();
 }
 
+template<typename T> T*
+Scene::RegisterSystem()
+{
+    return sm->RegisterSystem<T>();
+}
+
 void
 Scene::Debug()
 {
@@ -240,9 +267,16 @@ SystemManager::SystemManager(Scene& scene): scene{scene} {}
 SystemManager::~SystemManager() {}
 
 template<typename T> T*
-RegisterSystem()
+SystemManager::RegisterSystem()
 {
+    systems.push_back(std::make_unique<T>(scene));
+    return dynamic_cast<T*>(systems.back().get());
+}
 
+void
+SystemManager::UpdateAll()
+{
+    for (auto& s : systems) s->Update();
 }
 
 void SystemManager::Debug() {}

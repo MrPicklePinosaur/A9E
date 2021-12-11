@@ -34,8 +34,6 @@ PlayerControllerSystem::OnUpdate()
 
         if (inputer->GetKeyDown('a')) transform.pos.x -= player_controller.speed;
         if (inputer->GetKeyDown('d')) transform.pos.x += player_controller.speed;
-        if (inputer->GetKeyDown('w')) transform.pos.y -= player_controller.speed;
-        if (inputer->GetKeyDown('s')) transform.pos.y += player_controller.speed;
     }
 }
 

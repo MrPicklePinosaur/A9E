@@ -35,31 +35,31 @@ struct Render {
     bool visible = true;
 };
 
-class RendererSystem : public System
+class RenderSystem : public System
 {
     Renderer* r;
 public:
-    RendererSystem(Scene& scene);
-    ~RendererSystem();
+    RenderSystem(Scene& scene);
+    ~RenderSystem();
     void BeforeUpdate() override;
     void OnUpdate() override;
     void AfterUpdate() override;
 };
 
-RendererSystem::RendererSystem(Scene& scene): System{scene}
+RenderSystem::RenderSystem(Scene& scene): System{scene}
 {
     r = scene.GetRenderer();
 }
 
-RendererSystem::~RendererSystem() {}
+RenderSystem::~RenderSystem() {}
 
-void RendererSystem::BeforeUpdate()
+void RenderSystem::BeforeUpdate()
 {
     r->ClearGameScreen();     
 }
 
 void
-RendererSystem::OnUpdate()
+RenderSystem::OnUpdate()
 {
     for (auto& e : scene.MakeEntityView<Transform,Render>()) {
         Transform& transform = scene.GetComponent<Transform>(e);
@@ -89,7 +89,7 @@ RendererSystem::OnUpdate()
     }
 }
 
-void RendererSystem::AfterUpdate()
+void RenderSystem::AfterUpdate()
 {
     r->DrawGameScreen();
     r->RefreshGameScreen();
