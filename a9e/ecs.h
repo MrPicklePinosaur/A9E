@@ -8,6 +8,7 @@
 #include <any>
 #include <vector>
 #include <unordered_map>
+#include <unordered_set>
 #include <array>
 #include <memory>
 #include <queue>
@@ -41,7 +42,7 @@ class Scene
     std::unique_ptr<Renderer> renderer;
     std::unique_ptr<Inputer> inputer;
 
-    std::vector<Entity> kill_list;
+    std::unordered_set<Entity> kill_list; // set prevents duplicate deletes
 
     std::any global; // user can use for whatever purpose
     float delta = 0.0f;

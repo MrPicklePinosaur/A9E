@@ -1,5 +1,6 @@
 
 #include <vector>
+#include <string>
 #include <chrono>
 
 #include "a9e.h"
@@ -21,7 +22,7 @@ const std::vector<Wave> waves = {
         .spawn_point = {2, 2}
     },
     Wave{
-        .spawns = {SpawnBasicEnemy},
+        .spawns = {SpawnTwinGunnerEnemy},
         .count = 20,
         .pad = 5s,
         .stagger = 1s,
@@ -32,23 +33,27 @@ const std::vector<Wave> waves = {
 int
 main(int argc, char** argv)
 {
-    Scene scene;
+    try {
+        Scene scene;
 
-    scene.RegisterSystem<RenderSystem>();
-    scene.RegisterSystem<PhysicsSystem>();
-    auto* collider_system = scene.RegisterSystem<ColliderSystem>();
-    scene.RegisterSystem<PlayerControllerSystem>();
-    scene.RegisterSystem<PlayerHpSystem>();
-    scene.RegisterSystem<EnemyControllerSystem>();
-    auto* wave_system = scene.RegisterSystem<WaveSystem>();
+        scene.RegisterSystem<RenderSystem>();
+        scene.RegisterSystem<PhysicsSystem>();
+        auto* collider_system = scene.RegisterSystem<ColliderSystem>();
+        scene.RegisterSystem<PlayerControllerSystem>();
+        scene.RegisterSystem<PlayerHpSystem>();
+        scene.RegisterSystem<EnemyControllerSystem>();
+        auto* wave_system = scene.RegisterSystem<WaveSystem>();
 
-    collider_system->SetCollidesWith(CollisionTag_PlayerBullet, CollisionTag_Enemy);
-    collider_system->SetCollidesWith(CollisionTag_EnemyBullet, CollisionTag_Player);
-    wave_system->AddWaves(waves);
+        collider_system->SetCollidesWith(CollisionTag_PlayerBullet, CollisionTag_Enemy);
+        collider_system->SetCollidesWith(CollisionTag_EnemyBullet, CollisionTag_Player);
+        wave_system->AddWaves(waves);
 
-    SpawnPlayer(scene, vec2{10, 20});
+        SpawnPlayer(scene, vec2{10, 20});
 
-    try { scene.Run(); } catch(...) { }
+        scene.Run();
+    } catch(const char* err){
+        std::cout << std::string(err) << std::endl;
+    }
 
     return 0;
 }

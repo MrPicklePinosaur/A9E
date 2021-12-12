@@ -3,6 +3,8 @@
 #include "transform.h"
 #include "physicsbody.h"
 
+const int DESPAWN_PADDING = 5;
+
 PhysicsSystem::PhysicsSystem(Scene& scene): System{scene} {}
 PhysicsSystem::~PhysicsSystem() {}
 
@@ -18,7 +20,7 @@ PhysicsSystem::OnUpdate()
         PhysicsBody& physics_body = scene.GetComponent<PhysicsBody>(e);
 
         // delete the entity of it's offscreen
-        if (physics_body.cleanOffScreen && (transform.pos.x < 0 || transform.pos.x > r->GetScreenWidth() || transform.pos.y < 0 || transform.pos.y > r->GetScreenHeight())) {
+        if (physics_body.cleanOffScreen && (transform.pos.x < 0-DESPAWN_PADDING || transform.pos.x > r->GetScreenWidth()+DESPAWN_PADDING || transform.pos.y < 0-DESPAWN_PADDING || transform.pos.y > r->GetScreenHeight()+DESPAWN_PADDING)) {
             scene.DestroyEntity(e);
             continue;
         }

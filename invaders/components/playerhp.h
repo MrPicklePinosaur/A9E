@@ -4,7 +4,7 @@
 #include "a9e.h"
 
 struct PlayerHp {
-    unsigned int hp = 3;
+    int hp = 3;
 };
 
 class PlayerHpSystem : public System

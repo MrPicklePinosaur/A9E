@@ -38,7 +38,7 @@ Scene::CreateEntity()
 void
 Scene::DestroyEntity(Entity e)
 {
-    kill_list.push_back(e);
+    kill_list.insert(e);
 }
 
 void
@@ -197,7 +197,9 @@ ComponentManager::RemoveAllComponents(Entity e)
 {
     // this is not the cleanest
     for (auto& vt : ca_pool)
-        if (vt.second->HasComponent(e)) vt.second->RemoveComponent(e);    
+        if (vt.second.get()->HasComponent(e)) {
+            vt.second.get()->RemoveComponent(e);    
+        }
 }
 
 void

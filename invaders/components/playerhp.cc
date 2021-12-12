@@ -14,7 +14,7 @@ PlayerHpSystem::OnUpdate()
         PlayerHp& player_hp = scene.GetComponent<PlayerHp>(e);
 
         // draw health to status (could move this responsibility to other system)
-        r->WriteStatus(std::string(player_hp.hp, '+'), 0);
+        if (player_hp.hp >= 0) r->WriteStatus(std::string(player_hp.hp, '+'), 0);
 
         if (player_hp.hp == 0) {
             // lose event

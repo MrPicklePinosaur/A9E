@@ -4,7 +4,9 @@
 #include "a9e.h"
 
 struct EnemyController {
-
+    float speed = 10.0f;
+    int firerate = 100;
+    void (*onShoot)(Scene&,Entity) = nullptr;
 };
 
 class EnemyControllerSystem : public System
