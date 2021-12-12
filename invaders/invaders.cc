@@ -14,19 +14,30 @@
 using namespace std::chrono_literals;
 
 const std::vector<Wave> waves = {
+    Wave{},
+    Wave{
+        .spawns = {SpawnBomberEnemy},
+        .count = 3,
+        .pad = 5s,
+        .stagger = 3s,
+        .spawn_point = {0, 2},
+        .direction = {1.0f, 0.0f}
+    },
     Wave{
         .spawns = {SpawnBasicEnemy},
-        .count = 2,
-        .pad = 10s,
+        .count = 5,
+        .pad = 12s,
         .stagger = 1s,
-        .spawn_point = {2, 2}
+        .spawn_point = {0, 2},
+        .direction = {1.0f, 0.0f}
     },
     Wave{
         .spawns = {SpawnTwinGunnerEnemy},
-        .count = 20,
+        .count = 10,
         .pad = 5s,
         .stagger = 1s,
-        .spawn_point = {2, 5}
+        .spawn_point = {80, 5},
+        .direction = {-1.0f, 0.0f}
     },
 };
 
@@ -48,7 +59,7 @@ main(int argc, char** argv)
         collider_system->SetCollidesWith(CollisionTag_EnemyBullet, CollisionTag_Player);
         wave_system->AddWaves(waves);
 
-        SpawnPlayer(scene, vec2{10, 20});
+        SpawnPlayer(scene, vec2{10, 20}, {1.0f, 0.0f});
 
         scene.Run();
     } catch(const char* err){

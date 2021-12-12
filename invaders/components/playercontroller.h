@@ -5,7 +5,7 @@
 
 struct PlayerController {
     float speed;
-    bool autofire = true;
+    bool autofire = false;
 };
 
 class PlayerControllerSystem : public System

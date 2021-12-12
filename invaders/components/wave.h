@@ -13,6 +13,7 @@ struct Wave {
     std::chrono::seconds pad;     // time before next wave
     std::chrono::seconds stagger; // time between spawns in current wave
     vec2 spawn_point;
+    vec2 direction = vec2{1.0f, 0.0f};
 };
 
 class WaveSystem : public System

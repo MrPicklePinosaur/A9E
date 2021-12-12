@@ -6,7 +6,7 @@
 #include "components/playerhp.h"
 
 void
-SpawnPlayer(Scene& scene, const vec2& pos)
+SpawnPlayer(Scene& scene, const vec2& pos, const vec2& dir)
 {
     float playerSpeed = 20.0f;
     Entity e = scene.CreateEntity();
@@ -17,7 +17,7 @@ SpawnPlayer(Scene& scene, const vec2& pos)
         .isSimulated = true,
         .useGravity = false,
         .cleanOffScreen = false,
-        .velocity = vec2{playerSpeed, 0.0f}
+        .velocity = dir*playerSpeed
     });
     scene.AddComponent<PlayerController>(e, {.speed = playerSpeed});
     scene.AddComponent<PlayerHp>(e, PlayerHp{});
@@ -35,12 +35,13 @@ SpawnPlayer(Scene& scene, const vec2& pos)
 }
 
 void
-SpawnPlayerBullet(Scene& scene, const vec2& pos)
+SpawnPlayerBullet(Scene& scene, const vec2& pos, const vec2& dir)
 {
+    float bulletSpeed = 10.0f;
     Entity e = scene.CreateEntity();
     scene.AddComponent<Transform>(e, {.pos = pos});
     scene.AddComponent<Render>(e, {RenderType_Char, RenderChar{'|'}});
-    scene.AddComponent<PhysicsBody>(e, {.mass = 1.0f, .isSimulated = true, .useGravity = false, .velocity = {0.0f, -10.0f}});
+    scene.AddComponent<PhysicsBody>(e, {.mass = 1.0f, .isSimulated = true, .useGravity = false, .velocity = dir*bulletSpeed});
     scene.AddComponent<Collider>(e, {
         .data = std::make_shared<BoxColData>(vec2{0.0f, 0.0f}, vec2{1.0f, 1.0f}),
         .collider_id = CollisionTag_PlayerBullet,
@@ -50,12 +51,13 @@ SpawnPlayerBullet(Scene& scene, const vec2& pos)
 }
 
 void
-SpawnBasicEnemy(Scene& scene, const vec2& pos)
+SpawnBasicEnemy(Scene& scene, const vec2& pos, const vec2& dir)
 {
+    float enemySpeed = 10.0f;
     Entity e = scene.CreateEntity();
     scene.AddComponent<Transform>(e, {.pos = pos});
     scene.AddComponent<Render>(e, {RenderType_Char, RenderChar{'V'}});
-    scene.AddComponent<PhysicsBody>(e, {.velocity = {10.0f, 0.0f}});
+    scene.AddComponent<PhysicsBody>(e, {.velocity = dir*enemySpeed});
     scene.AddComponent<EnemyController>(e, {
         .onShoot = [](Scene& scene, Entity self) {
             Transform& transform = scene.GetComponent<Transform>(self);
@@ -73,12 +75,13 @@ SpawnBasicEnemy(Scene& scene, const vec2& pos)
 }
 
 void
-SpawnBasicEnemyBullet(Scene& scene, const vec2& pos)
+SpawnBasicEnemyBullet(Scene& scene, const vec2& pos, const vec2& dir)
 {
+    float bulletSpeed = 10.0f;
     Entity e = scene.CreateEntity();
     scene.AddComponent<Transform>(e, {.pos = pos});
     scene.AddComponent<Render>(e, {RenderType_Char, RenderChar{'o'}});
-    scene.AddComponent<PhysicsBody>(e, {.velocity = {0.0f, 10.0f}});
+    scene.AddComponent<PhysicsBody>(e, {.velocity = dir*bulletSpeed});
     scene.AddComponent<Collider>(e, {
         .data = std::make_shared<BoxColData>(vec2{0.0f, 0.0f}, vec2{1.0f, 1.0f}),
         .collider_id = CollisionTag_EnemyBullet,
@@ -88,12 +91,13 @@ SpawnBasicEnemyBullet(Scene& scene, const vec2& pos)
 }
 
 void
-SpawnTwinGunnerEnemy(Scene& scene, const vec2& pos)
+SpawnTwinGunnerEnemy(Scene& scene, const vec2& pos, const vec2& dir)
 {
+    float enemySpeed = 10.0f;
     Entity e = scene.CreateEntity();
     scene.AddComponent<Transform>(e, {.pos = pos});
     scene.AddComponent<Render>(e, {RenderType_Bitmap, RenderBitmap{{{'T',-1,0},{'V',0,0},{'T',1,0}}}});
-    scene.AddComponent<PhysicsBody>(e, {.velocity = {10.0f, 0.0f}});
+    scene.AddComponent<PhysicsBody>(e, {.velocity = dir*enemySpeed});
     scene.AddComponent<EnemyController>(e, {
         .onShoot = [](Scene& scene, Entity self) {
             Transform& transform = scene.GetComponent<Transform>(self);
@@ -108,5 +112,51 @@ SpawnTwinGunnerEnemy(Scene& scene, const vec2& pos)
             Collider& col_other = scene.GetComponent<Collider>(other);
             if (col_other.collider_id == CollisionTag_PlayerBullet) scene.DestroyEntity(self);
         }
+    });
+}
+
+void
+SpawnBomberEnemy(Scene& scene, const vec2& pos, const vec2& dir)
+{
+    float enemySpeed = 5.0f;
+    Entity e = scene.CreateEntity();
+    scene.AddComponent<Transform>(e, {.pos = pos});
+    scene.AddComponent<Render>(e, {RenderType_Bitmap, RenderBitmap{{{'|',-1,0},{'O',0,0},{'|',1,0}}}});
+    scene.AddComponent<PhysicsBody>(e, {.velocity = dir*enemySpeed});
+    scene.AddComponent<EnemyController>(e, {
+        .onShoot = [](Scene& scene, Entity self) {
+            Transform& transform = scene.GetComponent<Transform>(self);
+            SpawnBomberEnemyBullet(scene, transform.pos+vec2{0.0f, 1.0f});
+        }
+    });
+    scene.AddComponent<Collider>(e, {
+        .data = std::make_shared<BoxColData>(vec2{-1.0f, 0.0f}, vec2{1.0f, 1.0f}),
+        .collider_id = CollisionTag_Enemy,
+        .onCollide = [](Scene& scene, Entity self, Entity other) {
+            Collider& col_other = scene.GetComponent<Collider>(other);
+            if (col_other.collider_id == CollisionTag_PlayerBullet) scene.DestroyEntity(self);
+        }
+    });
+}
+
+void
+SpawnBomberEnemyBullet(Scene& scene, const vec2& pos, const vec2& dir)
+{
+    float bulletSpeed = 20.0f;
+    RenderBitmap bm = RenderBitmap{{
+        {'\'',-1,-1},{'^',0,-1},{'\'',1,-1},
+        {'<' ,-1, 0},{'O',0, 0},{'>' ,1, 0},
+        {'\'',-1, 1},{'v',0, 1},{'\'',1, 1}
+    }};
+
+    Entity e = scene.CreateEntity();
+    scene.AddComponent<Transform>(e, {.pos = pos});
+    scene.AddComponent<Render>(e, {RenderType_Bitmap, bm});
+    scene.AddComponent<PhysicsBody>(e, {.velocity = dir*bulletSpeed});
+    scene.AddComponent<Collider>(e, {
+        .data = std::make_shared<BoxColData>(vec2{-1.0f, -1.0f}, vec2{1.0f, 1.0f}),
+        .collider_id = CollisionTag_EnemyBullet,
+        .isTrigger = true,
+        .onCollide = [](Scene& scene, Entity self, Entity other) { scene.DestroyEntity(self); }
     });
 }
