@@ -7,11 +7,12 @@
 void
 SpawnPlayer(Scene& scene, const vec2& pos)
 {
+    float playerSpeed = 20.0f;
     Entity e = scene.CreateEntity();
     scene.AddComponent<Transform>(e, {.pos = pos});
     scene.AddComponent<Render>(e, {RenderType_Char, RenderChar{'A'}});
-    scene.AddComponent<PhysicsBody>(e, {.mass = 10.0f, .isSimulated = true, .useGravity = false});
-    scene.AddComponent<PlayerController>(e, {.speed = 20.0f});
+    scene.AddComponent<PhysicsBody>(e, {.mass = 10.0f, .isSimulated = true, .useGravity = false, .cleanOffScreen = false, .velocity = vec2{playerSpeed, 0.0f}});
+    scene.AddComponent<PlayerController>(e, {.speed = playerSpeed});
     scene.AddComponent<Collider>(e, {.data = std::make_shared<BoxColData>(vec2{0.0f, 0.0f}, vec2{1.0f, 1.0f}), .collider_id = CollisionTag_Player});
 }
 

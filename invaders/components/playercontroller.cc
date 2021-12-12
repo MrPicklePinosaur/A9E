@@ -6,6 +6,7 @@ void
 PlayerControllerSystem::OnUpdate()
 {
     Inputer* inputer = scene.GetInputer();
+    Renderer* renderer = scene.GetRenderer();
 
     for (auto& e : scene.MakeEntityView<Transform,PlayerController,PhysicsBody>()) {
         Transform& transform = scene.GetComponent<Transform>(e);
@@ -18,6 +19,10 @@ PlayerControllerSystem::OnUpdate()
         if (inputer->GetKeyDown(' ') || player_controller.autofire) {
             SpawnPlayerBullet(scene, transform.pos+vec2{0.0f, -1.0f});
         }
+
+        // wrap player position 
+        if (transform.pos.x < 0) transform.pos.x = renderer->GetScreenWidth();
+        if (transform.pos.x > renderer->GetScreenWidth()) transform.pos.x = 0;
     }
 }
 

@@ -16,10 +16,10 @@ $ make
 - [x] user input
 - [x] simple physics
 - [x] collision system
-- [ ] collision mask
+- [x] collision mask
 - [ ] error/exception handling
 - [ ] logger that can either do to file or the ncurses stauts 'console'
-- [ ] ability to create and destroy entities in update loop (might need a create/destroy queue)
+- [x] ability to create and destroy entities in update loop (might need a create/destroy queue)
 - [ ] load bitmaps from file
 - [ ] package for linux distros
 
