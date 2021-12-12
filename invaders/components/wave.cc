@@ -14,7 +14,6 @@ WaveSystem::OnUpdate()
     
     // start new wave (if no spawns remaining)
     if (wave_remaining == 0 && duration_cast<seconds>(now-last_wave_time) > current_wave.pad) {
-        if (waves.size() > 1) waves.pop(); // keep looping the last wave
         last_wave_time = now;
 
         current_wave = waves.front();
@@ -32,6 +31,8 @@ WaveSystem::OnUpdate()
         current_wave.spawns[random_index](scene, current_wave.spawn_point);
 
         --wave_remaining;
+
+        if (wave_remaining == 0 && waves.size() > 1) waves.pop(); // keep looping the last wave
     }
 }
 

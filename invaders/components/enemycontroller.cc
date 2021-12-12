@@ -11,7 +11,7 @@ EnemyControllerSystem::OnUpdate()
         EnemyController& enemy_controller = scene.GetComponent<EnemyController>(e);
         PhysicsBody& physics_body = scene.GetComponent<PhysicsBody>(e);
 
-        if (rand() % 30 == 1) SpawnEnemyBullet(scene, transform.pos);
+        if (rand() % 30 == 1) SpawnEnemyBullet(scene, transform.pos+vec2{0.0f, 1.0f});
         
     }
 }

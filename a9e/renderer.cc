@@ -3,12 +3,16 @@
 #include "config.h"
 #include "renderer.h"
 
-CursesRenderer::CursesRenderer(): Renderer{}
+Renderer::Renderer(int screen_width, int screen_height, int status_height):
+    screen_width{screen_width}, screen_height{screen_height}, status_height{status_height} {}
+
+CursesRenderer::CursesRenderer(int screen_width, int screen_height, int status_height):
+    Renderer{screen_width, screen_height, status_height}
 {
     CursesInit();
 
-    game_win = std::make_unique<Window>(SCREEN_HEIGHT-STATUS_HEIGHT, SCREEN_WIDTH, 0, 0);
-    status_win = std::make_unique<Window>(STATUS_HEIGHT, SCREEN_WIDTH, SCREEN_HEIGHT-STATUS_HEIGHT, 0);
+    game_win = std::make_unique<Window>(screen_height-status_height, screen_width, 0, 0);
+    status_win = std::make_unique<Window>(status_height, screen_width, screen_height-status_height, 0);
 
     refresh();
 }
@@ -21,8 +25,9 @@ CursesRenderer::~CursesRenderer()
 void
 CursesRenderer::DrawChar(char c, int x, int y)
 {
-    if (x < 0 || y < 0) return; 
-    if (x > SCREEN_WIDTH || y > SCREEN_HEIGHT) return; // TODO account for borders and stuff
+    if (x < 0 || y < 0) return;
+    // TODO account for borders and stuff
+    /* if (x > screen_width || y > screen_height) return; */
 
     mvwprintw(game_win->getwin(), y, x, std::string(1, c).c_str());
 }

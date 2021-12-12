@@ -1,11 +1,13 @@
 #ifndef __COMMON_H__
 #define __COMMON_H__
 
+#include "a9e.h"
+
 enum CollisionTag {
-    CollisionTag_Player       = 0 << 0,
-    CollisionTag_PlayerBullet = 0 << 1,
-    CollisionTag_Enemy        = 0 << 2,
-    CollisionTag_EnemyBullet  = 0 << 3
+    CollisionTag_Player = 0,
+    CollisionTag_PlayerBullet,
+    CollisionTag_Enemy,
+    CollisionTag_EnemyBullet
 };
 
 #endif // __COMMON_H__

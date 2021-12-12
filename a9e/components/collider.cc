@@ -4,6 +4,9 @@
 #include "physicsbody.h"
 #include "collider.h"
 
+const float CORRECTION_PERCENT = 1.0f;
+const float SLOP = 0.0f;
+
 ColliderSystem::ColliderSystem(Scene& scene): System{scene} {}
 ColliderSystem::~ColliderSystem() {}
 
@@ -11,6 +14,19 @@ void
 ColliderSystem::SetContactCallback(void (*contactCallback)(Scene&, Entity, Entity))
 {
     this->contactCallback = contactCallback;
+}
+
+void
+ColliderSystem::SetCollidesWith(ColliderId id_a, ColliderId id_b)
+{
+    ColliderMask mask_a = (collision_matrix.find(id_a) == collision_matrix.end()) ? ColliderMask{} : collision_matrix[id_a];
+    ColliderMask mask_b = (collision_matrix.find(id_b) == collision_matrix.end()) ? ColliderMask{} : collision_matrix[id_b];
+
+    mask_a.set(id_b);
+    mask_b.set(id_a);
+
+    collision_matrix[id_a] = mask_a;
+    collision_matrix[id_b] = mask_b;
 }
 
 void
@@ -37,8 +53,16 @@ ColliderSystem::OnUpdate()
             if (e1_trans.layer != e2_trans.layer) continue;
 
             CollisionData collision_data = e1_col.data->CheckCollide(e1_trans, e2_col.data.get(), e2_trans);
-            if (collision_data.isCollision)
-                collisions.push_back(Collision{.a = e1, .b = e2, .collision_data = collision_data});
+            if (collision_data.isCollision) {
+                
+                // check collision mask
+                if (
+                    collision_matrix.find(e1_col.collider_id) != collision_matrix.end() &&
+                    collision_matrix[e1_col.collider_id].test(e2_col.collider_id)
+                ) {
+                    collisions.push_back(Collision{.a = e1, .b = e2, .collision_data = collision_data});
+                }
+            }
         }
     }
 

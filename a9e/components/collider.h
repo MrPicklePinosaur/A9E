@@ -3,21 +3,25 @@
 
 #include <memory>
 #include <bitset>
+#include <unordered_map>
 
 #include "../ecs.h"
 #include "../math/vec.h"
 #include "transform.h"
 
-const int MAX_COLLIDER_TAGS = 32;
+const unsigned int MAX_COLLIDER_TAGS = 32;
 
 class ColData;
 class BoxColData;
 class SphereColData;
 
+using ColliderId   = int;
+using ColliderMask = std::bitset<MAX_COLLIDER_TAGS>;
+
 struct Collider {
     // TODO try getting this to work with unique ptr
     std::shared_ptr<ColData> data;
-    std::bitset<MAX_COLLIDER_TAGS> tags;
+    ColliderId collider_id;
     bool isTrigger = false;
 };
 
@@ -87,10 +91,12 @@ public:
 class ColliderSystem : public System
 {
     void (*contactCallback)(Scene&, Entity, Entity) = nullptr;
+    std::unordered_map<ColliderId, ColliderMask> collision_matrix;
 public:
     ColliderSystem(Scene& scene);
     ~ColliderSystem();
     void SetContactCallback(void (*contactCallback)(Scene&, Entity, Entity));
+    void SetCollidesWith(ColliderId id_a, ColliderId id_b);
     void BeforeUpdate() override;
     void OnUpdate() override;
     void AfterUpdate() override;
