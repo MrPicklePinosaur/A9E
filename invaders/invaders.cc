@@ -7,6 +7,7 @@
 #include "components/playercontroller.h"
 #include "components/enemycontroller.h"
 #include "components/playerhp.h"
+#include "components/score.h"
 #include "components/wave.h"
 #include "spawner.h"
 #include "common.h"
@@ -52,6 +53,7 @@ main(int argc, char** argv)
         auto* collider_system = scene.RegisterSystem<ColliderSystem>();
         scene.RegisterSystem<PlayerControllerSystem>();
         scene.RegisterSystem<PlayerHpSystem>();
+        scene.RegisterSystem<PlayerScoreSystem>();
         scene.RegisterSystem<EnemyControllerSystem>();
         auto* wave_system = scene.RegisterSystem<WaveSystem>();
 

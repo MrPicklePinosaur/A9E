@@ -19,5 +19,7 @@ PlayerHpSystem::OnUpdate()
         if (player_hp.hp == 0) {
             // lose event
         }
+
+        break;
     }
 }

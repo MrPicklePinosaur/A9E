@@ -4,6 +4,7 @@
 #include "components/enemycontroller.h"
 #include "components/playercontroller.h"
 #include "components/playerhp.h"
+#include "components/score.h"
 
 void
 SpawnPlayer(Scene& scene, const vec2& pos, const vec2& dir)
@@ -21,6 +22,7 @@ SpawnPlayer(Scene& scene, const vec2& pos, const vec2& dir)
     });
     scene.AddComponent<PlayerController>(e, {.speed = playerSpeed});
     scene.AddComponent<PlayerHp>(e, PlayerHp{});
+    scene.AddComponent<PlayerScore>(e, PlayerScore{});
     scene.AddComponent<Collider>(e, {
         .data = std::make_shared<BoxColData>(vec2{0.0f, 0.0f}, vec2{1.0f, 1.0f}),
         .collider_id = CollisionTag_Player,
@@ -46,7 +48,16 @@ SpawnPlayerBullet(Scene& scene, const vec2& pos, const vec2& dir)
         .data = std::make_shared<BoxColData>(vec2{0.0f, 0.0f}, vec2{1.0f, 1.0f}),
         .collider_id = CollisionTag_PlayerBullet,
         .isTrigger = true,
-        .onCollide = [](Scene& scene, Entity self, Entity other) { scene.DestroyEntity(self); }
+        .onCollide = [](Scene& scene, Entity self, Entity other) {
+            scene.DestroyEntity(self);
+            // give player score
+            ScoreReward& score_reward = scene.GetComponent<ScoreReward>(other);
+            for (auto& e : scene.MakeEntityView<PlayerScore>()) {
+                PlayerScore& player_score = scene.GetComponent<PlayerScore>(e);
+                player_score.score += score_reward.reward;
+            }
+
+        }
     });
 }
 
@@ -64,6 +75,7 @@ SpawnBasicEnemy(Scene& scene, const vec2& pos, const vec2& dir)
             SpawnBasicEnemyBullet(scene, transform.pos+vec2{0.0f, 1.0f});
         }
     });
+    scene.AddComponent<ScoreReward>(e, {10});
     scene.AddComponent<Collider>(e, {
         .data = std::make_shared<BoxColData>(vec2{0.0f, 0.0f}, vec2{1.0f, 1.0f}),
         .collider_id = CollisionTag_Enemy,
@@ -105,6 +117,7 @@ SpawnTwinGunnerEnemy(Scene& scene, const vec2& pos, const vec2& dir)
             SpawnBasicEnemyBullet(scene, transform.pos+vec2{1.0f, 1.0f});
         }
     });
+    scene.AddComponent<ScoreReward>(e, {20});
     scene.AddComponent<Collider>(e, {
         .data = std::make_shared<BoxColData>(vec2{-1.0f, 0.0f}, vec2{1.0f, 1.0f}),
         .collider_id = CollisionTag_Enemy,
@@ -129,6 +142,7 @@ SpawnBomberEnemy(Scene& scene, const vec2& pos, const vec2& dir)
             SpawnBomberEnemyBullet(scene, transform.pos+vec2{0.0f, 1.0f});
         }
     });
+    scene.AddComponent<ScoreReward>(e, {30});
     scene.AddComponent<Collider>(e, {
         .data = std::make_shared<BoxColData>(vec2{-1.0f, 0.0f}, vec2{1.0f, 1.0f}),
         .collider_id = CollisionTag_Enemy,
