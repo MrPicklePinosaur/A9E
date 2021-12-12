@@ -29,17 +29,6 @@ const std::vector<Wave> waves = {
     },
 };
 
-void
-contactCallback(Scene& scene, Entity a, Entity b)
-{
-    std::cout << "COLLISION BETWEEN " << a << " AND " << b << std::endl;
-    Collider& col_a = scene.GetComponent<Collider>(a);
-    Collider& col_b = scene.GetComponent<Collider>(b);
-
-    if (col_a.collider_id == CollisionTag_PlayerBullet && col_b.collider_id == CollisionTag_Enemy) { scene.DestroyEntity(a); scene.DestroyEntity(b); }
-    if (col_b.collider_id == CollisionTag_PlayerBullet && col_a.collider_id == CollisionTag_Enemy) { scene.DestroyEntity(a); scene.DestroyEntity(b); }
-}
-
 int
 main(int argc, char** argv)
 {
@@ -53,7 +42,6 @@ main(int argc, char** argv)
     auto* wave_system = scene.RegisterSystem<WaveSystem>();
     scene.RegisterSystem<GlobalSystem>();
 
-    collider_system->SetContactCallback(contactCallback);
     collider_system->SetCollidesWith(CollisionTag_PlayerBullet, CollisionTag_Enemy);
     collider_system->SetCollidesWith(CollisionTag_EnemyBullet, CollisionTag_Player);
     wave_system->AddWaves(waves);
@@ -61,7 +49,11 @@ main(int argc, char** argv)
 
     SpawnPlayer(scene, vec2{10, 20});
 
-    scene.Run();
+    try {
+        scene.Run();
+    } catch(const char* err) {
+        std::cout << std::string(err) << std::endl;        
+    }
 
     return 0;
 }

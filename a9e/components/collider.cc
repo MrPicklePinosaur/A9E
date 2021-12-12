@@ -11,12 +11,6 @@ ColliderSystem::ColliderSystem(Scene& scene): System{scene} {}
 ColliderSystem::~ColliderSystem() {}
 
 void
-ColliderSystem::SetContactCallback(void (*contactCallback)(Scene&, Entity, Entity))
-{
-    this->contactCallback = contactCallback;
-}
-
-void
 ColliderSystem::SetCollidesWith(ColliderId id_a, ColliderId id_b)
 {
     ColliderMask mask_a = (collision_matrix.find(id_a) == collision_matrix.end()) ? ColliderMask{} : collision_matrix[id_a];
@@ -93,8 +87,12 @@ ColliderSystem::OnUpdate()
     }
 
     // call the callback for each collision
-    if (contactCallback != nullptr) {
-        for (auto& c : collisions) contactCallback(scene, c.a, c.b);
+    for (auto& c : collisions) {
+        Collider& col_a = scene.GetComponent<Collider>(c.a);
+        Collider& col_b = scene.GetComponent<Collider>(c.b);
+
+        if (col_a.onCollide != nullptr) col_a.onCollide(scene, c.a, c.b);
+        if (col_b.onCollide != nullptr) col_b.onCollide(scene, c.b, c.a);
     }
 
 }

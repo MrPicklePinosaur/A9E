@@ -18,7 +18,7 @@
 #include "config.h"
 
 const int MAX_COMPONENTS = 32;
-const int MAX_ENTITIES = 1028; // if we switch to using vector instead of array we can have this be uncapped
+const int MAX_ENTITIES = 2048; // if we switch to using vector instead of array we can have this be uncapped
 
 using Entity = std::uint32_t;
 using ComponentId = std::uint8_t;

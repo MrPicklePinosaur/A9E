@@ -17,6 +17,7 @@ class CursesInputer final : public Inputer
 {
     std::unique_ptr<std::thread> listen_thread;
     std::bitset<256> key_map;
+    bool listen = true;
 public:
     CursesInputer();
     ~CursesInputer();

@@ -23,6 +23,7 @@ struct Collider {
     std::shared_ptr<ColData> data;
     ColliderId collider_id;
     bool isTrigger = false;
+    void (*onCollide)(Scene&,Entity,Entity) = nullptr;
 };
 
 struct CollisionData {
@@ -90,12 +91,10 @@ public:
 
 class ColliderSystem : public System
 {
-    void (*contactCallback)(Scene&, Entity, Entity) = nullptr;
     std::unordered_map<ColliderId, ColliderMask> collision_matrix;
 public:
     ColliderSystem(Scene& scene);
     ~ColliderSystem();
-    void SetContactCallback(void (*contactCallback)(Scene&, Entity, Entity));
     void SetCollidesWith(ColliderId id_a, ColliderId id_b);
     void BeforeUpdate() override;
     void OnUpdate() override;

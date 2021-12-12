@@ -5,12 +5,16 @@
 CursesInputer::CursesInputer():
     Inputer{}, listen_thread{std::make_unique<std::thread>(&CursesInputer::ListenInputer, this)} {}
 
-CursesInputer::~CursesInputer() {}
+CursesInputer::~CursesInputer()
+{
+    listen = false;
+    listen_thread->join();
+}
 
 void
 CursesInputer::ListenInputer()
 {
-    while (true) {
+    while (listen) {
 
         // not using the builtin curses getch since that doesn't have multithread support
         int c = getchar();
