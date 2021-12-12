@@ -5,7 +5,6 @@
 
 struct Transform {
     vec2 pos;
-    int layer = 0;
 };
 
 #endif // __A9E_TRANSFORM_H__

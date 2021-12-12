@@ -3,11 +3,8 @@
 #include "config.h"
 #include "renderer.h"
 
-Renderer::Renderer(int screen_width, int screen_height, int status_height):
-    screen_width{screen_width}, screen_height{screen_height}, status_height{status_height} {}
-
 CursesRenderer::CursesRenderer(int screen_width, int screen_height, int status_height):
-    Renderer{screen_width, screen_height, status_height}
+    Renderer{}, screen_width{screen_width}, screen_height{screen_height}, status_height{status_height}
 {
     CursesInit();
 

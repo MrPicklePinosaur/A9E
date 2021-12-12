@@ -22,6 +22,8 @@ Scene::Run()
         sm->UpdateAll();
         inputer->ClearKeyMap();
 
+        PurgeKillList();
+
         std::chrono::steady_clock::time_point end_tick = std::chrono::steady_clock::now();
         delta = std::chrono::duration_cast<std::chrono::nanoseconds>(end_tick-beg_tick).count()/1000000000.0f;
     }
@@ -36,9 +38,7 @@ Scene::CreateEntity()
 void
 Scene::DestroyEntity(Entity e)
 {
-    // TODO remove all of entity's components
-    cm->RemoveAllComponents(e);
-    em->DestroyEntity(e);
+    kill_list.push_back(e);
 }
 
 void
@@ -47,6 +47,16 @@ Scene::Debug()
     cm->Debug();
     em->Debug();
     sm->Debug();
+}
+
+void
+Scene::PurgeKillList()
+{
+    for (auto& e: kill_list) {
+        cm->RemoveAllComponents(e);
+        em->DestroyEntity(e);
+    }
+    kill_list.clear();
 }
 
 /* =-=-=-=-= SystemManager =-=-=-=-=-= */

@@ -11,9 +11,17 @@ void PhysicsSystem::BeforeUpdate() {}
 void
 PhysicsSystem::OnUpdate()
 {
+    Renderer* r = scene.GetRenderer();
+
     for (auto& e : scene.MakeEntityView<Transform,PhysicsBody>()) {
         Transform& transform = scene.GetComponent<Transform>(e);
         PhysicsBody& physics_body = scene.GetComponent<PhysicsBody>(e);
+
+        // delete the entity of it's offscreen
+        if (physics_body.cleanOffScreen && (transform.pos.x < 0 || transform.pos.x > r->GetScreenWidth() || transform.pos.y < 0 || transform.pos.y > r->GetScreenHeight())) {
+            scene.DestroyEntity(e);
+            continue;
+        }
 
         if (!physics_body.isSimulated) continue;
 

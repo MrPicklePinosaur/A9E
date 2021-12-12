@@ -2,6 +2,18 @@
 #include "spawner.h"
 #include "common.h"
 #include "components/enemycontroller.h"
+#include "components/playercontroller.h"
+
+void
+SpawnPlayer(Scene& scene, const vec2& pos)
+{
+    Entity e = scene.CreateEntity();
+    scene.AddComponent<Transform>(e, {.pos = pos});
+    scene.AddComponent<Render>(e, {RenderType_Char, RenderChar{'A'}});
+    scene.AddComponent<PhysicsBody>(e, {.mass = 10.0f, .isSimulated = true, .useGravity = false});
+    scene.AddComponent<PlayerController>(e, {.speed = 20.0f});
+    scene.AddComponent<Collider>(e, {.data = std::make_shared<BoxColData>(vec2{0.0f, 0.0f}, vec2{1.0f, 1.0f}), .collider_id = CollisionTag_Player});
+}
 
 void
 SpawnBasicEnemy(Scene& scene, const vec2& pos)
@@ -31,5 +43,6 @@ SpawnEnemyBullet(Scene& scene, const vec2& pos)
     scene.AddComponent<Transform>(e, {.pos = pos});
     scene.AddComponent<Render>(e, {RenderType_Char, RenderChar{'o'}});
     scene.AddComponent<PhysicsBody>(e, {.mass = 1.0f, .isSimulated = true, .useGravity = false, .velocity = {0.0f, 10.0f}});
-    scene.AddComponent<Collider>(e, {.data = std::make_shared<BoxColData>(vec2{0.0f, 0.0f}, vec2{1.0f, 1.0f}), .isTrigger = true});
+    scene.AddComponent<Collider>(e, {.data = std::make_shared<BoxColData>(vec2{0.0f, 0.0f}, vec2{1.0f, 1.0f}), .collider_id = CollisionTag_EnemyBullet, .isTrigger = true});
 }
+

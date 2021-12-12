@@ -8,10 +8,8 @@
 
 class Renderer
 {
-protected:
-    int screen_width, screen_height, status_height;
 public:
-    Renderer(int screen_width = 80, int screen_height = 25, int status_height = 3);
+    Renderer() {}
     virtual ~Renderer() {}
     virtual void DrawChar(char c, int x, int y) = 0;
     virtual void DrawBox(char c, int x, int y, int w, int h) = 0;
@@ -23,12 +21,16 @@ public:
     virtual void DrawStatusScreen() = 0;
     virtual void ClearGameScreen() = 0;
     virtual void ClearStatusScreen() = 0;
+    virtual int GetScreenWidth() const = 0;
+    virtual int GetScreenHeight() const = 0;
 };
 
 class CursesRenderer final : public Renderer
 {
     std::unique_ptr<Window> game_win;
     std::unique_ptr<Window> status_win;
+
+    int screen_width, screen_height, status_height;
 public:
     CursesRenderer(int screen_width = 80, int screen_height = 25, int status_height = 3);
     ~CursesRenderer();
@@ -42,6 +44,8 @@ public:
     void DrawStatusScreen() override;
     void ClearGameScreen() override;
     void ClearStatusScreen() override;
+    inline int GetScreenWidth() const { return screen_width; }
+    inline int GetScreenHeight() const { return screen_height; }
 private:
     void CursesInit();
     void CursesExit();

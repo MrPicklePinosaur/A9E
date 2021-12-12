@@ -6,6 +6,7 @@
 #include <cstdint>
 #include <bitset>
 #include <any>
+#include <vector>
 #include <unordered_map>
 #include <array>
 #include <memory>
@@ -39,14 +40,17 @@ class Scene
     std::unique_ptr<SystemManager> sm;
     std::unique_ptr<Renderer> renderer;
     std::unique_ptr<Inputer> inputer;
-    std::any global;
+
+    std::vector<Entity> kill_list;
+
+    std::any global; // user can use for whatever purpose
     float delta = 0.0f;
 public:
     Scene();
     ~Scene();
     void Run();
     Entity CreateEntity();
-    void DestroyEntity(Entity e);
+    void DestroyEntity(Entity e); // request entity be destroyed
     template<typename T> void AddComponent(Entity e, const T& component);
     template<typename T> void RemoveComponent(Entity e);
     template<typename T> T& GetComponent(Entity e);
@@ -60,6 +64,8 @@ public:
     template<typename T> void setGlobal(const T& g);
     template<typename T> T& getGlobal();
     void Debug();
+private:
+    void PurgeKillList(); // actually destroys entity
 };
 
 class EntityManager

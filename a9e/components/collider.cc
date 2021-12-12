@@ -50,8 +50,6 @@ ColliderSystem::OnUpdate()
             Collider& e2_col = scene.GetComponent<Collider>(e2);
             Transform& e2_trans = scene.GetComponent<Transform>(e2);
 
-            if (e1_trans.layer != e2_trans.layer) continue;
-
             CollisionData collision_data = e1_col.data->CheckCollide(e1_trans, e2_col.data.get(), e2_trans);
             if (collision_data.isCollision) {
                 

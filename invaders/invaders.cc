@@ -35,6 +35,9 @@ contactCallback(Scene& scene, Entity a, Entity b)
     std::cout << "COLLISION BETWEEN " << a << " AND " << b << std::endl;
     Collider& col_a = scene.GetComponent<Collider>(a);
     Collider& col_b = scene.GetComponent<Collider>(b);
+
+    if (col_a.collider_id == CollisionTag_PlayerBullet && col_b.collider_id == CollisionTag_Enemy) { scene.DestroyEntity(a); scene.DestroyEntity(b); }
+    if (col_b.collider_id == CollisionTag_PlayerBullet && col_a.collider_id == CollisionTag_Enemy) { scene.DestroyEntity(a); scene.DestroyEntity(b); }
 }
 
 int
@@ -52,17 +55,11 @@ main(int argc, char** argv)
 
     collider_system->SetContactCallback(contactCallback);
     collider_system->SetCollidesWith(CollisionTag_PlayerBullet, CollisionTag_Enemy);
+    collider_system->SetCollidesWith(CollisionTag_EnemyBullet, CollisionTag_Player);
     wave_system->AddWaves(waves);
     scene.setGlobal(GlobalState{});
 
-    {
-        Entity e = scene.CreateEntity();
-        scene.AddComponent<Transform>(e, {{10, 20}});
-        scene.AddComponent<Render>(e, {RenderType_Char, RenderChar{'A'}});
-        scene.AddComponent<PhysicsBody>(e, {.mass = 10.0f, .isSimulated = true, .useGravity = false});
-        scene.AddComponent<PlayerController>(e, {.speed = 20.0f});
-        scene.AddComponent<Collider>(e, {.data = std::make_shared<BoxColData>(vec2{0.0f, 0.0f}, vec2{1.0f, 1.0f}), .collider_id = CollisionTag_Player});
-    }
+    SpawnPlayer(scene, vec2{10, 20});
 
     scene.Run();
 

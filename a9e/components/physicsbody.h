@@ -11,6 +11,7 @@ struct PhysicsBody {
     float restitution = 1.0f;
     bool isSimulated = true;
     bool useGravity = true;
+    bool cleanOffScreen = true;
     vec2 velocity;
     float maxSpeed = 0.0f; // maxSpeed <= 0 means no max speed
     vec2 force;
