@@ -20,7 +20,6 @@ $ make
 - [x] error/exception handling
 - [ ] logger that can either do to file or the ncurses stauts 'console'
 - [x] ability to create and destroy entities in update loop (might need a create/destroy queue)
-- [ ] load bitmaps from file
 - [ ] package for linux distros
 
 ## RESOURCES

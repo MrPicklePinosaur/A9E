@@ -3,6 +3,7 @@
 #include "common.h"
 #include "components/enemycontroller.h"
 #include "components/playercontroller.h"
+#include "components/playerhp.h"
 
 void
 SpawnPlayer(Scene& scene, const vec2& pos)
@@ -11,15 +12,23 @@ SpawnPlayer(Scene& scene, const vec2& pos)
     Entity e = scene.CreateEntity();
     scene.AddComponent<Transform>(e, {.pos = pos});
     scene.AddComponent<Render>(e, {RenderType_Char, RenderChar{'A'}});
-    scene.AddComponent<PhysicsBody>(e, {.mass = 10.0f, .isSimulated = true, .useGravity = false, .cleanOffScreen = false, .velocity = vec2{playerSpeed, 0.0f}});
+    scene.AddComponent<PhysicsBody>(e, {
+        .mass = 10.0f,
+        .isSimulated = true,
+        .useGravity = false,
+        .cleanOffScreen = false,
+        .velocity = vec2{playerSpeed, 0.0f}
+    });
     scene.AddComponent<PlayerController>(e, {.speed = playerSpeed});
+    scene.AddComponent<PlayerHp>(e, PlayerHp{});
     scene.AddComponent<Collider>(e, {
         .data = std::make_shared<BoxColData>(vec2{0.0f, 0.0f}, vec2{1.0f, 1.0f}),
         .collider_id = CollisionTag_Player,
         .onCollide = [](Scene& scene, Entity self, Entity other) {
             Collider& col_other = scene.GetComponent<Collider>(other);
             if (col_other.collider_id == CollisionTag_EnemyBullet) {
-                // take damage
+                PlayerHp& player_hp = scene.GetComponent<PlayerHp>(self);
+                --player_hp.hp;
             }
         }
     });
