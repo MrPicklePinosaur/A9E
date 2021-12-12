@@ -3,10 +3,12 @@
 #include "config.h"
 #include "renderer.h"
 
-CursesRenderer::CursesRenderer(int screen_width, int screen_height, int status_height):
+CursesRenderer::CursesRenderer(bool enable_color, int screen_width, int screen_height, int status_height):
     Renderer{}, screen_width{screen_width}, screen_height{screen_height}, status_height{status_height}
 {
     CursesInit();
+
+    if (enable_color) CursesColorInit();
 
     game_win = std::make_unique<Window>(screen_height-status_height, screen_width, 0, 0);
     status_win = std::make_unique<Window>(status_height, screen_width, screen_height-status_height, 0);
@@ -98,6 +100,13 @@ CursesRenderer::CursesInit()
 	noecho();
 	curs_set(0);
 	keypad(stdscr, true);
+}
+
+void
+CursesRenderer::CursesColorInit()
+{
+    if (FALSE == has_colors()) throw "Your terminal does not support color";
+	start_color();
 }
 
 void

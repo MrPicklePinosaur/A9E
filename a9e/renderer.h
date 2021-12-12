@@ -32,7 +32,7 @@ class CursesRenderer final : public Renderer
 
     int screen_width, screen_height, status_height;
 public:
-    CursesRenderer(int screen_width = 80, int screen_height = 25, int status_height = 3);
+    CursesRenderer(bool enable_color, int screen_width = 80, int screen_height = 25, int status_height = 3);
     ~CursesRenderer();
     void DrawChar(char c, int x, int y) override;
     void DrawBox(char c, int x, int y, int w, int h) override;
@@ -48,6 +48,7 @@ public:
     inline int GetScreenHeight() const { return screen_height; }
 private:
     void CursesInit();
+    void CursesColorInit();
     void CursesExit();
 };
 

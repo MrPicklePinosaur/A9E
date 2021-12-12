@@ -7,7 +7,7 @@ Scene::Scene():
     cm{std::make_unique<ComponentManager>(*this)},
     em{std::make_unique<EntityManager>(*this)},
     sm{std::make_unique<SystemManager>(*this)},
-    renderer{std::make_unique<CursesRenderer>()},
+    renderer{std::make_unique<CursesRenderer>(false)},
     inputer{std::make_unique<CursesInputer>()} { }
 
 Scene::~Scene() {}
