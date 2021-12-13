@@ -46,6 +46,8 @@ class Scene
 
     std::any global; // user can use for whatever purpose
     float delta = 0.0f;
+
+    bool terminate_scene = false;
 public:
     Scene();
     ~Scene();
@@ -64,6 +66,7 @@ public:
     float getDelta() { return delta; }
     template<typename T> void setGlobal(const T& g);
     template<typename T> T& getGlobal();
+    void TerminateScene() { terminate_scene = true; }
     void Debug();
 private:
     void PurgeKillList(); // actually destroys entity

@@ -15,7 +15,7 @@ Scene::~Scene() {}
 void
 Scene::Run()
 {
-    while(true) {
+    while(!terminate_scene) {
         std::chrono::steady_clock::time_point beg_tick = std::chrono::steady_clock::now();
         std::this_thread::sleep_for(std::chrono::milliseconds(static_cast<int>(TIME_STEP*1000.0)));
 

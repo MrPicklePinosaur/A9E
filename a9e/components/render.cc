@@ -41,6 +41,11 @@ RenderSystem::OnUpdate()
                     r->DrawChar(pixel.c, transform.pos.x+pixel.x, transform.pos.y+pixel.y);
                 break;
             }
+            case RenderType_Text: {
+                RenderText data = std::get<RenderText>(render.data);
+                r->DrawText(data.text, transform.pos.x, transform.pos.y);
+                break;
+            }
             default: { }
         }
     }

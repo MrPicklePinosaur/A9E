@@ -3,13 +3,15 @@
 
 #include <variant>
 #include <vector>
+#include <string>
 #include "../ecs.h"
 
 enum RenderType {
     RenderType_None = 0,
     RenderType_Char,
     RenderType_Box,
-    RenderType_Bitmap
+    RenderType_Bitmap,
+    RenderType_Text
 };
 
 struct RenderChar {
@@ -28,9 +30,13 @@ struct RenderBitmap {
     std::vector<BitmapPixel> pixels;
 };
 
+struct RenderText {
+    std::string text;
+};
+
 struct Render {
     RenderType render_type;
-    std::variant<std::monostate, RenderChar, RenderBox, RenderBitmap> data;
+    std::variant<std::monostate, RenderChar, RenderBox, RenderBitmap, RenderText> data;
     bool visible = true;
 };
 

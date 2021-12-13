@@ -13,6 +13,7 @@ public:
     virtual ~Renderer() {}
     virtual void DrawChar(char c, int x, int y) = 0;
     virtual void DrawBox(char c, int x, int y, int w, int h) = 0;
+    virtual void DrawText(const std::string& text, int x, int y) = 0;
     virtual void WriteStatus(const std::string& s, int line) = 0;
     virtual void WriteStatus(const std::string& s, int x, int y) = 0;
     virtual void RefreshGameScreen() = 0;
@@ -36,6 +37,7 @@ public:
     ~CursesRenderer();
     void DrawChar(char c, int x, int y) override;
     void DrawBox(char c, int x, int y, int w, int h) override;
+    void DrawText(const std::string& text, int x, int y) override;
     void WriteStatus(const std::string& s, int line) override;
     void WriteStatus(const std::string& s, int x, int y) override;
     void RefreshGameScreen() override;

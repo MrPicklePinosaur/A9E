@@ -39,6 +39,12 @@ CursesRenderer::DrawBox(char c, int x, int y, int w, int h)
 }
 
 void
+CursesRenderer::DrawText(const std::string& text, int x, int y)
+{
+    mvwprintw(game_win->getwin(), y, x, text.c_str());
+}
+
+void
 CursesRenderer::WriteStatus(const std::string& s, int line)
 {
     // clear line beforehand
