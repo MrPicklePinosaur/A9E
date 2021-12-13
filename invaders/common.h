@@ -16,7 +16,8 @@ enum EnemyType {
     EnemyType_Bomber,
     EnemyType_MachineGunner,
     EnemyType_Scout,
-    EnemyType_Exploder
+    EnemyType_Charger,
+    EnemyType_Starfish,
 };
 
 enum EnemyBulletType {

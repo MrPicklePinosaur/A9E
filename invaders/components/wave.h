@@ -10,8 +10,8 @@
 struct Wave {
     std::vector<SpawnFunction> spawns;
     int count;     // number of units to spawn in current wave
-    std::chrono::seconds pad;     // time before next wave
-    std::chrono::seconds stagger; // time between spawns in current wave
+    std::chrono::milliseconds pad;     // time before next wave
+    std::chrono::milliseconds stagger; // time between spawns in current wave
     vec2 spawn_point;
     vec2 direction = vec2{1.0f, 0.0f};
 };
@@ -25,7 +25,7 @@ class WaveSystem : public System
 public:
     WaveSystem(Scene& scene): System{scene} {}
     ~WaveSystem() {}
-    void AddWaves(const std::vector<Wave>& new_waves);
+    void StartWaves(const std::vector<Wave>& new_waves);
     void BeforeUpdate() override {}
     void OnUpdate() override;
     void AfterUpdate() override {}

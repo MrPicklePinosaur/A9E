@@ -15,20 +15,11 @@
 using namespace std::chrono_literals;
 
 const std::vector<Wave> waves = {
-    Wave{},
-    Wave{
-        .spawns = {SpawnBomberEnemy},
-        .count = 3,
-        .pad = 5s,
-        .stagger = 3s,
-        .spawn_point = {0, 2},
-        .direction = {1.0f, 0.0f}
-    },
     Wave{
         .spawns = {SpawnBasicEnemy},
         .count = 5,
         .pad = 12s,
-        .stagger = 1s,
+        .stagger = 1500ms,
         .spawn_point = {0, 2},
         .direction = {1.0f, 0.0f}
     },
@@ -40,6 +31,110 @@ const std::vector<Wave> waves = {
         .spawn_point = {80, 5},
         .direction = {-1.0f, 0.0f}
     },
+    Wave{
+        .spawns = {SpawnBomberEnemy},
+        .count = 3,
+        .pad = 15s,
+        .stagger = 3s,
+        .spawn_point = {0, 2},
+        .direction = {1.0f, 0.0f}
+    },
+    Wave{
+        .spawns = {SpawnMachineGunnerEnemy},
+        .count = 5,
+        .pad = 10s,
+        .stagger = 1s,
+        .spawn_point = {80, 5},
+        .direction = {-1.0f, 0.0f}
+    },
+    Wave{
+        .spawns = {SpawnChargerEnemy},
+        .count = 1,
+        .pad = 0s,
+        .stagger = 1s,
+        .spawn_point = {40, 0},
+        .direction = {0.0f, 1.0f}
+    },
+    Wave{
+        .spawns = {SpawnChargerEnemy},
+        .count = 1,
+        .pad = 0s,
+        .stagger = 1s,
+        .spawn_point = {20, 0},
+        .direction = {0.0f, 1.0f}
+    },
+    Wave{
+        .spawns = {SpawnChargerEnemy},
+        .count = 1,
+        .pad = 0s,
+        .stagger = 1s,
+        .spawn_point = {50, 0},
+        .direction = {0.0f, 1.0f}
+    },
+    Wave{
+        .spawns = {SpawnChargerEnemy},
+        .count = 1,
+        .pad = 0s,
+        .stagger = 1s,
+        .spawn_point = {35, 0},
+        .direction = {0.0f, 1.0f}
+    },
+    Wave{
+        .spawns = {SpawnStarfishEnemy},
+        .count = 3,
+        .pad = 1s,
+        .stagger = 3s,
+        .spawn_point = {0, 10},
+        .direction = {1.0f, 0.0f}
+    },
+    Wave{
+        .spawns = {SpawnBasicEnemy},
+        .count = 2,
+        .pad = 0s,
+        .stagger = 500ms,
+        .spawn_point = {0, 5},
+        .direction = {1.0f, 0.0f}
+    },
+    Wave{
+        .spawns = {SpawnBasicEnemy},
+        .count = 2,
+        .pad = 0s,
+        .stagger = 500ms,
+        .spawn_point = {80, 5},
+        .direction = {-1.0f, 0.0f}
+    },
+    Wave{
+        .spawns = {SpawnBasicEnemy},
+        .count = 2,
+        .pad = 0s,
+        .stagger = 500ms,
+        .spawn_point = {0, 5},
+        .direction = {1.0f, 0.0f}
+    },
+    Wave{
+        .spawns = {SpawnBasicEnemy},
+        .count = 2,
+        .pad = 0s,
+        .stagger = 500ms,
+        .spawn_point = {80, 5},
+        .direction = {-1.0f, 0.0f}
+    },
+    Wave{
+        .spawns = {SpawnBasicEnemy},
+        .count = 2,
+        .pad = 0s,
+        .stagger = 500ms,
+        .spawn_point = {0, 5},
+        .direction = {1.0f, 0.0f}
+    },
+    Wave{
+        .spawns = {SpawnBasicEnemy},
+        .count = 2,
+        .pad = 0s,
+        .stagger = 500ms,
+        .spawn_point = {80, 5},
+        .direction = {-1.0f, 0.0f}
+    }
 };
 
 int
@@ -59,7 +154,7 @@ main(int argc, char** argv)
 
         collider_system->SetCollidesWith(CollisionTag_PlayerBullet, CollisionTag_Enemy);
         collider_system->SetCollidesWith(CollisionTag_EnemyBullet, CollisionTag_Player);
-        wave_system->AddWaves(waves);
+        wave_system->StartWaves(waves);
 
         SpawnPlayer(scene, vec2{10, 20}, {1.0f, 0.0f});
 
