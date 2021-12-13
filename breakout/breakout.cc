@@ -1,11 +1,9 @@
 
 #include "a9e.h"
 #include "components/playercontroller.h"
-
-enum CollisionTag {
-    CollisionTag_Player = 0,
-    CollisionTag_Ball
-};
+#include "components/lives.h"
+#include "spawner.h"
+#include "common.h"
 
 int
 main(int argc, char** argv)
@@ -18,28 +16,33 @@ main(int argc, char** argv)
         scene.RegisterSystem<PhysicsSystem>();
         auto* collider_system = scene.RegisterSystem<ColliderSystem>();
         scene.RegisterSystem<PlayerControllerSystem>();
+        scene.RegisterSystem<LivesSystem>();
 
         collider_system->SetCollidesWith(CollisionTag_Player, CollisionTag_Ball);
+        collider_system->SetCollidesWith(CollisionTag_Ball, CollisionTag_Wall);
 
         {
             Entity e = scene.CreateEntity();
             scene.AddComponent<Transform>(e, {.pos = {2, 2}});
-            scene.AddComponent<Render>(e, {RenderType_Box, RenderBox{'O', 2, 2}});
+            scene.AddComponent<Render>(e, {RenderType_Char, RenderChar{'O'}});
             scene.AddComponent<PhysicsBody>(e, {
                 .mass = 1.0f,
                 .isSimulated = true,
                 .useGravity = false,
                 .cleanOffScreen = false,
-                .velocity = {0.0f, 5.0f}
+                .velocity = {5.0f, 5.0f}
             });
             scene.AddComponent<Collider>(e, {
-                .data = std::make_shared<BoxColData>(vec2{0.0f, 0.0f}, vec2{2.0f, 2.0f}),
+                .data = std::make_shared<BoxColData>(vec2{0.0f, 0.0f}, vec2{1.0f, 1.0f}),
                 .collider_id = CollisionTag_Ball
             });
+            scene.AddComponent<Lives>(e, {});
         }
 
+        SpawnWalls(scene);
+
         {
-            int length = 5;
+            int length = 10;
 
             Entity e = scene.CreateEntity();
             scene.AddComponent<Transform>(e, {.pos = {2, 20}});
@@ -52,7 +55,7 @@ main(int argc, char** argv)
             });
             scene.AddComponent<PlayerController>(e, {.speed = 10.0f});
             scene.AddComponent<Collider>(e, {
-                .data = std::make_shared<BoxColData>(vec2{0.0f, 0.0f}, vec2{length, 1}),
+                .data = std::make_shared<BoxColData>(vec2{0.0f, 0.0f}, vec2{length, 2}),
                 .collider_id = CollisionTag_Player
             });
         }

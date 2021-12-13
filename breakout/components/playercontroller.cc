@@ -5,7 +5,6 @@ void
 PlayerControllerSystem::OnUpdate()
 {
     Inputer* inputer = scene.GetInputer();
-    Renderer* renderer = scene.GetRenderer();
 
     for (auto& e : scene.MakeEntityView<Transform,PlayerController,PhysicsBody>()) {
         Transform& transform = scene.GetComponent<Transform>(e);
