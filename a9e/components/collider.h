@@ -20,7 +20,7 @@ using ColliderMask = std::bitset<MAX_COLLIDER_TAGS>;
 
 struct Collider {
     // TODO try getting this to work with unique ptr
-    std::shared_ptr<ColData> data;
+    std::shared_ptr<ColData> data = nullptr;
     ColliderId collider_id;
     bool isTrigger = false;
     void (*onCollide)(Scene&,Entity,Entity) = nullptr;

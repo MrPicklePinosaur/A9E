@@ -342,6 +342,8 @@ template<typename T> void
 ComponentArray<T>::AddComponent(Entity e, const T& component)
 {
     // check if already added?
+    if (entity_to_index.find(e) != entity_to_index.end())
+        throw "Component already added";
 
     if (ca_size == MAX_ENTITIES)
         throw "Max entities reached. Consider increasing MAX_ENTITIES";
@@ -367,10 +369,10 @@ ComponentArray<T>::RemoveComponent(Entity e)
     ca[remove_entity_ind] = ca[last_entity_ind];
 
     // update bookkeeping stuff
-    entity_to_index.erase(e);
-    index_to_entity.erase(last_entity_ind);
     entity_to_index[last_entity] = remove_entity_ind;
     index_to_entity[remove_entity_ind] = last_entity;
+    entity_to_index.erase(e);
+    index_to_entity.erase(last_entity_ind);
 
     --ca_size;
 }
