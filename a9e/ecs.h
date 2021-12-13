@@ -138,7 +138,7 @@ private:
 class ComponentManager
 {
     Scene& scene;
-    std::unordered_map<ComponentId, std::unique_ptr<ComponentArrayBase>> ca_pool;
+    std::unordered_map<ComponentId, std::shared_ptr<ComponentArrayBase>> ca_pool;
 public:
     ComponentManager(Scene& scene);
     ~ComponentManager();
@@ -150,7 +150,7 @@ public:
     template<typename T> ComponentId GetComponentId();
     void Debug();
 private:
-    template<typename T> ComponentArray<T>* GetComponentArray();
+    template<typename T> std::shared_ptr<ComponentArray<T>> GetComponentArray();
 };
 
 class ComponentArrayBase
@@ -285,28 +285,28 @@ EntityManager::MakeEntityView()
 template<typename T> void
 ComponentManager::AddComponent(Entity e, const T& component)
 {
-    ComponentArray<T>* ca = GetComponentArray<T>();
+    std::shared_ptr<ComponentArray<T>> ca = GetComponentArray<T>();
     ca->AddComponent(e, component);
 }
 
 template<typename T> void
 ComponentManager::RemoveComponent(Entity e)
 {
-    ComponentArray<T>* ca = GetComponentArray<T>();
+    std::shared_ptr<ComponentArray<T>> ca = GetComponentArray<T>();
     ca->RemoveComponent(e);
 }
 
 template<typename T> T&
 ComponentManager::GetComponent(Entity e)
 {
-    ComponentArray<T>* ca = GetComponentArray<T>();
+    std::shared_ptr<ComponentArray<T>> ca = GetComponentArray<T>();
     return ca->GetComponent(e);
 }
 
 template<typename T> bool
 ComponentManager::HasComponent(Entity e)
 {
-    ComponentArray<T>* ca = GetComponentArray<T>();
+    std::shared_ptr<ComponentArray<T>> ca = GetComponentArray<T>();
     return ca->HasComponent(e);
 }
 
@@ -318,16 +318,16 @@ ComponentManager::GetComponentId()
     return component_id;
 }
 
-template<typename T> ComponentArray<T>*
+template<typename T> std::shared_ptr<ComponentArray<T>>
 ComponentManager::GetComponentArray()
 {
     ComponentId id = GetComponentId<T>();
 
     // check if we already have a component array for this (if not, create)
     if (ca_pool.find(id) == ca_pool.end())
-        ca_pool[id] = std::make_unique<ComponentArray<T>>();
+        ca_pool.insert(std::pair(id, std::make_shared<ComponentArray<T>>()));
 
-    return static_cast<ComponentArray<T>*>(ca_pool[id].get());
+    return std::static_pointer_cast<ComponentArray<T>>(ca_pool[id]);
 }
 
 /* =-=-=-=-= ComponentArray =-=-=-=-=-= */

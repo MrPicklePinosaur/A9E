@@ -196,13 +196,16 @@ void
 ComponentManager::RemoveAllComponents(Entity e)
 {
     // this is not the cleanest
-    for (auto& vt : ca_pool)
-        if (vt.second.get()->HasComponent(e)) {
-            vt.second.get()->RemoveComponent(e);    
+    for (auto& vt : ca_pool) {
+        auto& ca = vt.second;
+        if (ca->HasComponent(e)) {
+            ca->RemoveComponent(e);
         }
+    }
 }
 
 void
 ComponentManager::Debug()
 {
 }
+
