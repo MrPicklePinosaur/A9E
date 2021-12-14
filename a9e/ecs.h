@@ -16,7 +16,6 @@
 
 #include "renderer.h"
 #include "inputer.h"
-#include "config.h"
 
 const int MAX_COMPONENTS = 32;
 const int MAX_ENTITIES = 2048; // if we switch to using vector instead of array we can have this be uncapped
@@ -39,17 +38,18 @@ class Scene
     std::unique_ptr<ComponentManager> cm;
     std::unique_ptr<EntityManager> em;
     std::unique_ptr<SystemManager> sm;
-    std::unique_ptr<Renderer> renderer;
-    std::unique_ptr<Inputer> inputer;
-
-    std::unordered_set<Entity> kill_list; // set prevents duplicate deletes
-
+    Renderer* renderer;
+    Inputer* inputer;
     std::any global; // user can use for whatever purpose
-    float delta = 0.0f;
 
+    float time_step = 0.05f;
+
+    // for use of system
+    std::unordered_set<Entity> kill_list; // set prevents duplicate deletes
+    float delta = 0.0f;
     bool terminate_scene = false;
 public:
-    Scene();
+    Scene(Renderer* renderer, Inputer* inputer);
     ~Scene();
     void Run();
     Entity CreateEntity();
@@ -61,8 +61,8 @@ public:
     template<typename... ComponentIds> EntityView MakeEntityView();
     template<typename T> ComponentId GetComponentId();
     template<typename T> T* RegisterSystem();
-    Renderer* GetRenderer() { return renderer.get(); }
-    Inputer* GetInputer() { return inputer.get(); }
+    Renderer* GetRenderer() { return renderer; }
+    Inputer* GetInputer() { return inputer; }
     float getDelta() { return delta; }
     template<typename T> void setGlobal(const T& g);
     template<typename T> T& getGlobal();

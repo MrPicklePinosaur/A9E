@@ -3,12 +3,12 @@
 
 /* =-=-=-=-= Scene =-=-=-=-=-= */
 
-Scene::Scene():
+Scene::Scene(Renderer* renderer, Inputer* inputer):
     cm{std::make_unique<ComponentManager>(*this)},
     em{std::make_unique<EntityManager>(*this)},
     sm{std::make_unique<SystemManager>(*this)},
-    renderer{std::make_unique<CursesRenderer>(false)},
-    inputer{std::make_unique<CursesInputer>()} { }
+    renderer{renderer},
+    inputer{inputer} { }
 
 Scene::~Scene() {}
 
@@ -17,7 +17,7 @@ Scene::Run()
 {
     while(!terminate_scene) {
         std::chrono::steady_clock::time_point beg_tick = std::chrono::steady_clock::now();
-        std::this_thread::sleep_for(std::chrono::milliseconds(static_cast<int>(TIME_STEP*1000.0)));
+        std::this_thread::sleep_for(std::chrono::milliseconds(static_cast<int>(time_step*1000.0)));
 
         sm->UpdateAll();
         inputer->ClearKeyMap();

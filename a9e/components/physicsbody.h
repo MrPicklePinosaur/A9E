@@ -19,12 +19,14 @@ struct PhysicsBody {
 
 class PhysicsSystem : public System
 {
+    float gravity = 9.0f;
 public:
     PhysicsSystem(Scene& scene);
     ~PhysicsSystem();
     void BeforeUpdate() override;
     void OnUpdate() override;
     void AfterUpdate() override;
+    inline void SetGravity(float gravity) { this->gravity = gravity; }
 };
 
 #endif // __A9E_PHYSICSBODY_H__

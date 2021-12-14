@@ -139,51 +139,47 @@ const std::vector<Wave> waves = {
     }
 };
 
-void
-MenuScene()
-{
-    Scene scene;
-
-    scene.RegisterSystem<RenderSystem>();
-    scene.RegisterSystem<MenuControllerSystem>();
-
-    {
-        Entity e = scene.CreateEntity();
-        scene.AddComponent<Transform>(e, {.pos = {10, 10}});
-        scene.AddComponent<Render>(e, {RenderType_Text, RenderText{"[ Press Space Twice to Begin ]"}});
-    }
-
-    scene.Run();
-}
-
-void
-GameScene()
-{
-    Scene scene;
-
-    scene.RegisterSystem<RenderSystem>();
-    scene.RegisterSystem<ExitControllerSystem>();
-    scene.RegisterSystem<PhysicsSystem>();
-    auto* collider_system = scene.RegisterSystem<ColliderSystem>();
-    scene.RegisterSystem<PlayerControllerSystem>();
-    scene.RegisterSystem<PlayerHpSystem>();
-    scene.RegisterSystem<PlayerScoreSystem>();
-    scene.RegisterSystem<EnemyControllerSystem>();
-    auto* wave_system = scene.RegisterSystem<WaveSystem>();
-
-    collider_system->SetCollidesWith(CollisionTag_PlayerBullet, CollisionTag_Enemy);
-    collider_system->SetCollidesWith(CollisionTag_EnemyBullet, CollisionTag_Player);
-    wave_system->StartWaves(waves);
-    SpawnPlayer(scene, vec2{10, 20}, {1.0f, 0.0f});
-
-    scene.Run();
-}
-
 int
 main(int argc, char** argv)
 {
-    MenuScene();
-    GameScene();
+    CursesRenderer renderer{false};
+    CursesInputer inputer{};
+
+    { // menu scene
+        Scene scene{&renderer, &inputer};
+
+        scene.RegisterSystem<RenderSystem>();
+        scene.RegisterSystem<MenuControllerSystem>();
+
+        {
+            Entity e = scene.CreateEntity();
+            scene.AddComponent<Transform>(e, {.pos = {10, 10}});
+            scene.AddComponent<Render>(e, {RenderType_Text, RenderText{"[ Press Space to Begin ]"}});
+        }
+
+        scene.Run();
+    }
+
+    { // game scene
+        Scene scene{&renderer, &inputer};
+
+        scene.RegisterSystem<RenderSystem>();
+        scene.RegisterSystem<ExitControllerSystem>();
+        scene.RegisterSystem<PhysicsSystem>();
+        auto* collider_system = scene.RegisterSystem<ColliderSystem>();
+        scene.RegisterSystem<PlayerControllerSystem>();
+        scene.RegisterSystem<PlayerHpSystem>();
+        scene.RegisterSystem<PlayerScoreSystem>();
+        scene.RegisterSystem<EnemyControllerSystem>();
+        auto* wave_system = scene.RegisterSystem<WaveSystem>();
+
+        collider_system->SetCollidesWith(CollisionTag_PlayerBullet, CollisionTag_Enemy);
+        collider_system->SetCollidesWith(CollisionTag_EnemyBullet, CollisionTag_Player);
+        wave_system->StartWaves(waves);
+        SpawnPlayer(scene, vec2{10, 20}, {1.0f, 0.0f});
+
+        scene.Run();
+    }
 
     return 0;
 }

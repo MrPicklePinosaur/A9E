@@ -22,6 +22,7 @@ public:
     virtual void DrawStatusScreen() = 0;
     virtual void ClearGameScreen() = 0;
     virtual void ClearStatusScreen() = 0;
+
     virtual int GetScreenWidth() const = 0;
     virtual int GetScreenHeight() const = 0;
     virtual int GetStatusHeight() const = 0;
@@ -32,6 +33,7 @@ class CursesRenderer final : public Renderer
     std::unique_ptr<Window> game_win;
     std::unique_ptr<Window> status_win;
 
+    bool color_mode;
     int screen_width, screen_height, status_height;
 public:
     CursesRenderer(bool enable_color, int screen_width = 80, int screen_height = 25, int status_height = 3);
@@ -47,6 +49,9 @@ public:
     void DrawStatusScreen() override;
     void ClearGameScreen() override;
     void ClearStatusScreen() override;
+    
+    void RegisterColorPair();
+
     inline int GetScreenWidth() const { return screen_width; }
     inline int GetScreenHeight() const { return screen_height; }
     inline int GetStatusHeight() const { return status_height; }

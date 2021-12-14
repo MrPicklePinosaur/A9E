@@ -26,7 +26,7 @@ BIRB_DEPS=${BIRB_OBJ:.o=.d}
 
 .PHONY: clean-a9e clean-invaders clean-birb clean install uninstall
 
-all: ${A9E_SO} ${INVADERS_EXEC} ${BIRB_EXEC}
+all: ${INVADERS_EXEC} ${BIRB_EXEC}
 
 ${A9E_SO}: ${A9E_OBJ}
 	${CXX} $^ -shared -o $@ ${LIBS}

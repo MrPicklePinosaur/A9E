@@ -8,7 +8,6 @@
 
 #include "renderer.h"
 #include "inputer.h"
-#include "config.h"
 #include "ecs.h"
 
 #endif // __A9E_H__

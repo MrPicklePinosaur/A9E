@@ -36,6 +36,7 @@ a wiki for **A9E** may or may not be coming in the future.
 ## TODO
 - [x] entity component system
 - [ ] color
+- [ ] terminal beep
 - [ ] utf8 support
 - [x] better way of assigning entity ids
 - [x] user input
@@ -43,8 +44,9 @@ a wiki for **A9E** may or may not be coming in the future.
 - [x] collision system
 - [x] collision mask
 - [x] error/exception handling
-- [ ] logger that can either do to file or the ncurses status 'console'
 - [x] ability to create and destroy entities in update loop
+- [ ] renderer + input should really be decoupled from scene
+- [x] build shared library
 - [ ] package for linux distros
 
 ## RESOURCES

@@ -1,10 +1,9 @@
 
 #include <ncurses.h>
-#include "config.h"
 #include "renderer.h"
 
 CursesRenderer::CursesRenderer(bool enable_color, int screen_width, int screen_height, int status_height):
-    Renderer{}, screen_width{screen_width}, screen_height{screen_height}, status_height{status_height}
+    Renderer{}, color_mode{enable_color}, screen_width{screen_width}, screen_height{screen_height}, status_height{status_height}
 {
     CursesInit();
 

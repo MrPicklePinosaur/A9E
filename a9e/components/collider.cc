@@ -1,6 +1,5 @@
 
 #include <algorithm>
-#include "../config.h"
 #include "physicsbody.h"
 #include "collider.h"
 
