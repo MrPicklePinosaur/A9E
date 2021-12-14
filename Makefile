@@ -13,23 +13,23 @@ INVADERS_SRC=$(shell find $(INVADERS_DIR) -name '*.cc')
 INVADERS_OBJ=${INVADERS_SRC:.cc=.o}
 INVADERS_DEPS=${INVADERS_OBJ:.o=.d}
 
-BREAKOUT_EXEC=breakout-game
-BREAKOUT_DIR=./breakout
-BREAKOUT_SRC=$(shell find $(BREAKOUT_DIR) -name '*.cc')
-BREAKOUT_OBJ=${BREAKOUT_SRC:.cc=.o}
-BREAKOUT_DEPS=${BREAKOUT_OBJ:.o=.d}
+BIRB_EXEC=birb-game
+BIRB_DIR=./birb
+BIRB_SRC=$(shell find $(BIRB_DIR) -name '*.cc')
+BIRB_OBJ=${BIRB_SRC:.cc=.o}
+BIRB_DEPS=${BIRB_OBJ:.o=.d}
 
-all: ${INVADERS_EXEC} ${BREAKOUT_EXEC}
+all: ${INVADERS_EXEC} ${BIRB_EXEC}
 
 ${INVADERS_EXEC}: ${A9E_OBJ} ${INVADERS_OBJ}
 	${CXX} ${A9E_OBJ} ${INVADERS_OBJ} -o ${INVADERS_EXEC} ${LIBS}
 
 -include ${A9E_DEPS} ${INVADERS_DEPS}
 
-${BREAKOUT_EXEC}: ${A9E_OBJ} ${BREAKOUT_OBJ}
-	${CXX} ${A9E_OBJ} ${BREAKOUT_OBJ} -o ${BREAKOUT_EXEC} ${LIBS}
+${BIRB_EXEC}: ${A9E_OBJ} ${BIRB_OBJ}
+	${CXX} ${A9E_OBJ} ${BIRB_OBJ} -o ${BIRB_EXEC} ${LIBS}
 
--include ${A9E_DEPS} ${BREAKOUT_DEPS}
+-include ${A9E_DEPS} ${BIRB_DEPS}
 
 .PHONY: clean
 
@@ -39,8 +39,8 @@ clean-a9e:
 clean-invaders:
 	rm -f ${INVADERS_OBJ} ${INVADERS_DEPS} ${INVADERS_EXEC}
 
-clean-breakout:
-	rm -f ${BREAKOUT_OBJ} ${BREAKOUT_DEPS} ${BREAKOUT_EXEC}
+clean-birb:
+	rm -f ${BIRB_OBJ} ${BIRB_DEPS} ${BIRB_EXEC}
 
-clean: clean-a9e clean-invaders clean-breakout
+clean: clean-a9e clean-invaders clean-birb
 
