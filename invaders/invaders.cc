@@ -4,7 +4,8 @@
 #include <chrono>
 
 #include "a9e.h"
-#include "components/menucontroller.h"
+#include "components/ui/menucontroller.h"
+#include "components/ui/exitcontroller.h"
 #include "components/playercontroller.h"
 #include "components/enemycontroller.h"
 #include "components/playerhp.h"
@@ -161,6 +162,7 @@ GameScene()
     Scene scene;
 
     scene.RegisterSystem<RenderSystem>();
+    scene.RegisterSystem<ExitControllerSystem>();
     scene.RegisterSystem<PhysicsSystem>();
     auto* collider_system = scene.RegisterSystem<ColliderSystem>();
     scene.RegisterSystem<PlayerControllerSystem>();

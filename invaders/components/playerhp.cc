@@ -18,6 +18,8 @@ PlayerHpSystem::OnUpdate()
 
         if (player_hp.hp == 0) {
             // lose event
+            r->WriteStatus("You are dead.", 0);
+            scene.DestroyEntity(e);
         }
 
         break;

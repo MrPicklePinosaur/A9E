@@ -1,5 +1,6 @@
 
 #include <iostream>
+#include <cstdio>
 #include "inputer.h"
 
 CursesInputer::CursesInputer():
@@ -17,7 +18,7 @@ CursesInputer::ListenInputer()
     while (listen) {
 
         // not using the builtin curses getch since that doesn't have multithread support
-        int c = getchar();
+        int c = std::getchar();
         if (c < 0) continue;
 
         SetKeyDown(c);
