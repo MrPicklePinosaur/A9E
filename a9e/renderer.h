@@ -24,6 +24,7 @@ public:
     virtual void ClearStatusScreen() = 0;
     virtual int GetScreenWidth() const = 0;
     virtual int GetScreenHeight() const = 0;
+    virtual int GetStatusHeight() const = 0;
 };
 
 class CursesRenderer final : public Renderer
@@ -48,6 +49,7 @@ public:
     void ClearStatusScreen() override;
     inline int GetScreenWidth() const { return screen_width; }
     inline int GetScreenHeight() const { return screen_height; }
+    inline int GetStatusHeight() const { return status_height; }
 private:
     void CursesInit();
     void CursesColorInit();
