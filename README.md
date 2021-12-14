@@ -1,12 +1,37 @@
 
 # A9E - pinosaur's ascii game engine
 
-## BUILDING
+**A9E** is a simple ascii game engine that comes bundled with an entity
+component system and a simple physics engine that is capable of rigid body
+collision detection and response.
 
-the ncurses library is required. install it depending on your system. then simply run
+three demo programs (**invaders**, **flappy birb** and a **physics demo**) are
+also included in this repository to show off how the **A9E** engine can be used
+to create games.
+
+## INSTALLING A9E LIBRARY
+
+install the shared library and headers by running:
+```
+$ make liba9e.so && sudo make install
+```
+
+uninstall with
+```
+$ sudo make uninstall
+```
+
+## BUILDING FROM SOURCE
+
+the ncurses library is required. install it depending on your system. then
+to build the engine along with the demos, simply run:
 ```
 $ make
 ```
+
+## DOCUMENTATION
+
+a wiki for **A9E** may or may not be coming in the future.
 
 ## TODO
 - [x] entity component system
@@ -18,8 +43,8 @@ $ make
 - [x] collision system
 - [x] collision mask
 - [x] error/exception handling
-- [ ] logger that can either do to file or the ncurses stauts 'console'
-- [x] ability to create and destroy entities in update loop (might need a create/destroy queue)
+- [ ] logger that can either do to file or the ncurses status 'console'
+- [x] ability to create and destroy entities in update loop
 - [ ] package for linux distros
 
 ## RESOURCES
@@ -30,3 +55,4 @@ some resources that were used when writing this project
 - [physics engine in 5 min](https://www.youtube.com/watch?v=-_IspRG548E)
 - [impulse resolution and collision detection](https://gamedevelopment.tutsplus.com/tutorials/how-to-create-a-custom-2d-physics-engine-the-basics-and-impulse-resolution--gamedev-6331)
 - [paper on impulse resolution](https://research.ncl.ac.uk/game/mastersdegree/gametechnologies/physicstutorials/5collisionresponse/Physics%20-%20Collision%20Response.pdf)
+
