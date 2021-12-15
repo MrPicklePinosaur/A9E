@@ -11,9 +11,11 @@ using namespace std::chrono_literals;
 int
 main(int argc, char** argv)
 {
-    try {
+    CursesRenderer renderer{false};
+    CursesInputer inputer{};
 
-        Scene scene;
+    {
+        Scene scene{&renderer, &inputer};
 
         scene.RegisterSystem<RenderSystem>();
         scene.RegisterSystem<PhysicsSystem>();
@@ -30,8 +32,6 @@ main(int argc, char** argv)
 
         scene.Run();
 
-    } catch(const char* err){
-        std::cout << std::string(err) << std::endl;
     }
 
     return 0;

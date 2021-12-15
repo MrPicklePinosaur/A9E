@@ -24,7 +24,13 @@ BIRB_SRC=$(shell find $(BIRB_DIR) -name '*.cc')
 BIRB_OBJ=${BIRB_SRC:.cc=.o}
 BIRB_DEPS=${BIRB_OBJ:.o=.d}
 
-.PHONY: clean-a9e clean-invaders clean-birb clean install uninstall
+PHYSICS_EXEC=physics-game
+PHYSICS_DIR=physics
+PHYSICS_SRC=$(shell find $(PHYSICS_DIR) -name '*.cc')
+PHYSICS_OBJ=${PHYSICS_SRC:.cc=.o}
+PHYSICS_DEPS=${PHYSICS_OBJ:.o=.d}
+
+.PHONY: clean-a9e clean-invaders clean-birb clean-physics clean install uninstall
 
 all: ${INVADERS_EXEC} ${BIRB_EXEC}
 
@@ -43,6 +49,11 @@ ${BIRB_EXEC}: ${A9E_OBJ} ${BIRB_OBJ}
 
 -include ${A9E_DEPS} ${BIRB_DEPS}
 
+${PHYSICS_EXEC}: ${A9E_OBJ} ${PHYSICS_OBJ}
+	${CXX} $^ -o $@ ${LIBS}
+
+-include ${A9E_DEPS} ${PHYSICS_DEPS}
+
 clean-a9e:
 	rm -f ${A9E_OBJ} ${A9E_DEPS} ${A9E_SO}
 
@@ -52,7 +63,10 @@ clean-invaders:
 clean-birb:
 	rm -f ${BIRB_OBJ} ${BIRB_DEPS} ${BIRB_EXEC}
 
-clean: clean-a9e clean-invaders clean-birb
+clean-physics:
+	rm -f ${PHYSICS_OBJ} ${PHYSICS_DEPS} ${PHYSICS_EXEC}
+
+clean: clean-a9e clean-invaders clean-birb clean-physics
 
 .ONEHSELL:
 install: ${A9E_SO}

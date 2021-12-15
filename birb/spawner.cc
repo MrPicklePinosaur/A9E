@@ -1,4 +1,5 @@
 
+#include <string>
 #include <cstdlib>
 #include "common.h"
 #include "components/playercontroller.h"
@@ -18,7 +19,7 @@ void SpawnPlayer(Scene& scene, const vec2& pos)
         .mass = 1.0f,
         .isSimulated = true,
         .useGravity = true,
-        .cleanOffScreen = false,
+        .cleanOffScreen = true,
     });
     scene.AddComponent<Collider>(e, {
         .data = std::make_shared<BoxColData>(vec2{0.4f, 0.4f}, vec2{0.6f, 0.6f}),
