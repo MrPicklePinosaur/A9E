@@ -4,7 +4,7 @@
 #include "a9e.h"
 #include "components/wave.h"
 
-void SpawnPlayer(Scene& scene, const vec2& pos, const vec2& dir);
+void SpawnPlayer(Scene& scene, const vec2& pos, const vec2& dir, bool invincible = false);
 void SpawnPlayerBullet(Scene& scene, const vec2& pos, const vec2& dir = vec2{0.0f, -1.0f});
 
 void SpawnBasicEnemy(Scene& scene, const vec2& pos, const vec2& dir);

@@ -5,6 +5,7 @@
 
 struct PlayerHp {
     int hp = 3;
+    bool invincible = false;
 };
 
 class PlayerHpSystem : public System

@@ -45,7 +45,17 @@ int
 main(int argc, char** argv)
 {
     bool enable_color = false;
-    if (argc >= 2 && std::string("-c").compare(std::string(argv[1])) == 0) enable_color = true;
+    bool invincible = false;
+    for (int i = 1; i < argc; ++i) {
+        if (std::string("-c").compare(argv[i]) == 0) enable_color = true;
+        else if (std::string("-i").compare(argv[i]) == 0) invincible = true;
+        else {
+            std::cout << "USAGE:" << std::endl;
+            std::cout << "-c    color mode" << std::endl;
+            std::cout << "-i    invincibility" << std::endl;
+            return 1;
+        }
+    }
 
     CursesRenderer renderer{enable_color};
     CursesInputer inputer{};
@@ -107,7 +117,7 @@ main(int argc, char** argv)
         collider_system->SetCollidesWith(CollisionTag_PlayerBullet, CollisionTag_Enemy);
         collider_system->SetCollidesWith(CollisionTag_EnemyBullet, CollisionTag_Player);
         wave_system->StartWaves(MakeWaves());
-        SpawnPlayer(scene, vec2{10, 20}, {1.0f, 0.0f});
+        SpawnPlayer(scene, vec2{10, 20}, {1.0f, 0.0f}, invincible);
 
         scene.Run();
     }

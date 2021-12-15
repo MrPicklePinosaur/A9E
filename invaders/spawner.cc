@@ -21,7 +21,7 @@ auto enemyBulletOnCollide = [](Scene& scene, Entity self, Entity other) {
     scene.DestroyEntity(self);
 };
 
-void SpawnPlayer(Scene& scene, const vec2& pos, const vec2& dir)
+void SpawnPlayer(Scene& scene, const vec2& pos, const vec2& dir, bool invincible)
 {
     using namespace std::chrono_literals;
 
@@ -37,7 +37,7 @@ void SpawnPlayer(Scene& scene, const vec2& pos, const vec2& dir)
         .velocity = dir*playerSpeed
     });
     scene.AddComponent<PlayerController>(e, {.speed = playerSpeed, .fire_cooldown = 300ms});
-    scene.AddComponent<PlayerHp>(e, PlayerHp{});
+    scene.AddComponent<PlayerHp>(e, PlayerHp{.invincible = invincible});
     scene.AddComponent<PlayerScore>(e, PlayerScore{});
     scene.AddComponent<Collider>(e, {
         .data = std::make_shared<BoxColData>(vec2{0.0f, 0.0f}, vec2{1.0f, 1.0f}),
