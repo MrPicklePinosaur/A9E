@@ -4,15 +4,30 @@
 #include "common.h"
 #include "components/enemycontroller.h"
 #include "components/playercontroller.h"
+#include "components/enemyhp.h"
 #include "components/playerhp.h"
 #include "components/score.h"
 
+auto enemyOnCollide = [](Scene& scene, Entity self, Entity other) {
+    Collider& col_other = scene.GetComponent<Collider>(other);
+    if (col_other.collider_id == CollisionTag_PlayerBullet) {
+        EnemyHp& enemy_hp = scene.GetComponent<EnemyHp>(self);
+        --enemy_hp.health;
+    }
+};
+
+auto enemyBulletOnCollide = [](Scene& scene, Entity self, Entity other) {
+    scene.DestroyEntity(self);
+};
+
 void SpawnPlayer(Scene& scene, const vec2& pos, const vec2& dir)
 {
+    using namespace std::chrono_literals;
+
     float playerSpeed = 20.0f;
     Entity e = scene.CreateEntity();
     scene.AddComponent<Transform>(e, {.pos = pos});
-    scene.AddComponent<Render>(e, {.render_type = RenderType_Char, .data = RenderChar{'A'}, .render_style = RenderStyle_Player});
+    scene.AddComponent<Render>(e, {RenderType_Char, RenderChar{'A', RenderStyle_Player}});
     scene.AddComponent<PhysicsBody>(e, {
         .mass = 10.0f,
         .isSimulated = true,
@@ -20,7 +35,7 @@ void SpawnPlayer(Scene& scene, const vec2& pos, const vec2& dir)
         .cleanOffScreen = false,
         .velocity = dir*playerSpeed
     });
-    scene.AddComponent<PlayerController>(e, {.speed = playerSpeed});
+    scene.AddComponent<PlayerController>(e, {.speed = playerSpeed, .fire_cooldown = 300ms});
     scene.AddComponent<PlayerHp>(e, PlayerHp{});
     scene.AddComponent<PlayerScore>(e, PlayerScore{});
     scene.AddComponent<Collider>(e, {
@@ -38,7 +53,7 @@ void SpawnPlayer(Scene& scene, const vec2& pos, const vec2& dir)
 
 void SpawnPlayerBullet(Scene& scene, const vec2& pos, const vec2& dir)
 {
-    float bulletSpeed = 10.0f;
+    float bulletSpeed = 20.0f;
     Entity e = scene.CreateEntity();
     scene.AddComponent<Transform>(e, {.pos = pos});
     scene.AddComponent<Render>(e, {RenderType_Char, RenderChar{'|'}});
@@ -55,7 +70,6 @@ void SpawnPlayerBullet(Scene& scene, const vec2& pos, const vec2& dir)
                 PlayerScore& player_score = scene.GetComponent<PlayerScore>(e);
                 player_score.score += score_reward.reward;
             }
-
         }
     });
 }
@@ -73,14 +87,12 @@ void SpawnBasicEnemy(Scene& scene, const vec2& pos, const vec2& dir)
             SpawnBasicEnemyBullet(scene, transform.pos+vec2{0.0f, 1.0f});
         }
     });
+    scene.AddComponent<EnemyHp>(e, {1});
     scene.AddComponent<ScoreReward>(e, {10});
     scene.AddComponent<Collider>(e, {
         .data = std::make_shared<BoxColData>(vec2{0.0f, 0.0f}, vec2{1.0f, 1.0f}),
         .collider_id = CollisionTag_Enemy,
-        .onCollide = [](Scene& scene, Entity self, Entity other) {
-            Collider& col_other = scene.GetComponent<Collider>(other);
-            if (col_other.collider_id == CollisionTag_PlayerBullet) scene.DestroyEntity(self);
-        }
+        .onCollide = enemyOnCollide
     });
 }
 
@@ -89,13 +101,13 @@ void SpawnBasicEnemyBullet(Scene& scene, const vec2& pos, const vec2& dir)
     float bulletSpeed = 10.0f;
     Entity e = scene.CreateEntity();
     scene.AddComponent<Transform>(e, {.pos = pos});
-    scene.AddComponent<Render>(e, {.render_type = RenderType_Char, .data = RenderChar{'o'}, .render_style = RenderStyle_BasicEnemyBullet});
+    scene.AddComponent<Render>(e, {RenderType_Char, RenderChar{'o', RenderStyle_BasicEnemyBullet}});
     scene.AddComponent<PhysicsBody>(e, {.velocity = dir*bulletSpeed});
     scene.AddComponent<Collider>(e, {
         .data = std::make_shared<BoxColData>(vec2{0.0f, 0.0f}, vec2{1.0f, 1.0f}),
         .collider_id = CollisionTag_EnemyBullet,
         .isTrigger = true,
-        .onCollide = [](Scene& scene, Entity self, Entity other) { scene.DestroyEntity(self); }
+        .onCollide = enemyBulletOnCollide
     });
 }
 
@@ -113,14 +125,12 @@ void SpawnTwinGunnerEnemy(Scene& scene, const vec2& pos, const vec2& dir)
             SpawnBasicEnemyBullet(scene, transform.pos+vec2{1.0f, 1.0f});
         }
     });
+    scene.AddComponent<EnemyHp>(e, {1});
     scene.AddComponent<ScoreReward>(e, {20});
     scene.AddComponent<Collider>(e, {
         .data = std::make_shared<BoxColData>(vec2{-1.0f, 0.0f}, vec2{1.0f, 1.0f}),
         .collider_id = CollisionTag_Enemy,
-        .onCollide = [](Scene& scene, Entity self, Entity other) {
-            Collider& col_other = scene.GetComponent<Collider>(other);
-            if (col_other.collider_id == CollisionTag_PlayerBullet) scene.DestroyEntity(self);
-        }
+        .onCollide = enemyOnCollide
     });
 }
 
@@ -138,14 +148,12 @@ void SpawnMachineGunnerEnemy(Scene& scene, const vec2& pos, const vec2& dir)
             SpawnBasicEnemyBullet(scene, transform.pos+vec2{0.0f, 1.0f});
         }
     });
+    scene.AddComponent<EnemyHp>(e, {1});
     scene.AddComponent<ScoreReward>(e, {40});
     scene.AddComponent<Collider>(e, {
         .data = std::make_shared<BoxColData>(vec2{-1.0f, 0.0f}, vec2{1.0f, 1.0f}),
         .collider_id = CollisionTag_Enemy,
-        .onCollide = [](Scene& scene, Entity self, Entity other) {
-            Collider& col_other = scene.GetComponent<Collider>(other);
-            if (col_other.collider_id == CollisionTag_PlayerBullet) scene.DestroyEntity(self);
-        }
+        .onCollide = enemyOnCollide
     });
 }
 
@@ -162,14 +170,12 @@ void SpawnBomberEnemy(Scene& scene, const vec2& pos, const vec2& dir)
             SpawnBomberEnemyBullet(scene, transform.pos+vec2{0.0f, 1.0f});
         }
     });
+    scene.AddComponent<EnemyHp>(e, {2});
     scene.AddComponent<ScoreReward>(e, {30});
     scene.AddComponent<Collider>(e, {
         .data = std::make_shared<BoxColData>(vec2{-1.0f, 0.0f}, vec2{1.0f, 1.0f}),
         .collider_id = CollisionTag_Enemy,
-        .onCollide = [](Scene& scene, Entity self, Entity other) {
-            Collider& col_other = scene.GetComponent<Collider>(other);
-            if (col_other.collider_id == CollisionTag_PlayerBullet) scene.DestroyEntity(self);
-        }
+        .onCollide = enemyOnCollide
     });
 }
 
@@ -190,7 +196,7 @@ void SpawnBomberEnemyBullet(Scene& scene, const vec2& pos, const vec2& dir)
         .data = std::make_shared<BoxColData>(vec2{-1.0f, -1.0f}, vec2{1.0f, 1.0f}),
         .collider_id = CollisionTag_EnemyBullet,
         .isTrigger = true,
-        .onCollide = [](Scene& scene, Entity self, Entity other) { scene.DestroyEntity(self); }
+        .onCollide = enemyBulletOnCollide
     });
 }
 
@@ -208,14 +214,12 @@ void SpawnChargerEnemy(Scene& scene, const vec2& pos, const vec2& dir)
             SpawnChargerEnemyBullet(scene, transform.pos+vec2{0.0f, 1.0f});
         }
     });
+    scene.AddComponent<EnemyHp>(e, {1});
     scene.AddComponent<ScoreReward>(e, {30});
     scene.AddComponent<Collider>(e, {
         .data = std::make_shared<BoxColData>(vec2{0.0f, 0.0f}, vec2{1.0f, 1.0f}),
         .collider_id = CollisionTag_Enemy,
-        .onCollide = [](Scene& scene, Entity self, Entity other) {
-            Collider& col_other = scene.GetComponent<Collider>(other);
-            if (col_other.collider_id == CollisionTag_PlayerBullet) scene.DestroyEntity(self);
-        }
+        .onCollide = enemyOnCollide
     });
 }
 
@@ -231,7 +235,7 @@ void SpawnChargerEnemyBullet(Scene& scene, const vec2& pos, const vec2& dir)
         .data = std::make_shared<BoxColData>(vec2{-1.0f, -1.0f}, vec2{1.0f, 1.0f}),
         .collider_id = CollisionTag_EnemyBullet,
         .isTrigger = true,
-        .onCollide = [](Scene& scene, Entity self, Entity other) { scene.DestroyEntity(self); }
+        .onCollide = enemyBulletOnCollide
     });
 }
 
@@ -256,14 +260,12 @@ void SpawnStarfishEnemy(Scene& scene, const vec2& pos, const vec2& dir)
             for (auto& d : dirs) SpawnStarfishEnemyBullet(scene, transform.pos+d, d);
         }
     });
+    scene.AddComponent<EnemyHp>(e, {3});
     scene.AddComponent<ScoreReward>(e, {60});
     scene.AddComponent<Collider>(e, {
         .data = std::make_shared<BoxColData>(vec2{0.0f, 0.0f}, vec2{1.0f, 1.0f}),
         .collider_id = CollisionTag_Enemy,
-        .onCollide = [](Scene& scene, Entity self, Entity other) {
-            Collider& col_other = scene.GetComponent<Collider>(other);
-            if (col_other.collider_id == CollisionTag_PlayerBullet) scene.DestroyEntity(self);
-        }
+        .onCollide = enemyOnCollide
     });
 }
 
@@ -279,6 +281,6 @@ void SpawnStarfishEnemyBullet(Scene& scene, const vec2& pos, const vec2& dir)
         .data = std::make_shared<BoxColData>(vec2{-1.0f, -1.0f}, vec2{1.0f, 1.0f}),
         .collider_id = CollisionTag_EnemyBullet,
         .isTrigger = true,
-        .onCollide = [](Scene& scene, Entity self, Entity other) { scene.DestroyEntity(self); }
+        .onCollide = enemyBulletOnCollide
     });
 }

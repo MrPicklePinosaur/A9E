@@ -16,15 +16,18 @@ enum RenderType {
 
 struct RenderChar {
     char c;
+    RenderStyleId s = RenderStyleNone;
 };
 struct RenderBox {
     char c;
     float w, h;
+    RenderStyleId s = RenderStyleNone;
 };
 
 struct BitmapPixel {
     char c;
     int x, y;
+    RenderStyleId s = RenderStyleNone;
 };
 struct RenderBitmap {
     std::vector<BitmapPixel> pixels;
@@ -32,12 +35,12 @@ struct RenderBitmap {
 
 struct RenderText {
     std::string text;
+    RenderStyleId s = RenderStyleNone;
 };
 
 struct Render {
     RenderType render_type;
     std::variant<std::monostate, RenderChar, RenderBox, RenderBitmap, RenderText> data;
-    RenderStyleId render_style = RenderStyleNone;
     bool visible = true;
 };
 

@@ -1,15 +1,17 @@
 #ifndef __PLAYERCONTROLLER_H__
 #define __PLAYERCONTROLLER_H__
 
+#include <chrono>
 #include "a9e.h"
 
 struct PlayerController {
     float speed;
-    bool autofire = false;
+    std::chrono::milliseconds fire_cooldown;
 };
 
 class PlayerControllerSystem : public System
 {
+    std::chrono::steady_clock::time_point last_shoot;
 public:
     PlayerControllerSystem(Scene& scene): System{scene} {}
     ~PlayerControllerSystem() {}

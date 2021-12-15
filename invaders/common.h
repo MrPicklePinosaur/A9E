@@ -28,7 +28,8 @@ enum EnemyBulletType {
 
 enum RenderStyle {
     RenderStyle_Player = 1,
-    RenderStyle_BasicEnemyBullet
+    RenderStyle_BasicEnemyBullet,
+    RenderStyle_StartText
 };
 
 #endif // __COMMON_H__
