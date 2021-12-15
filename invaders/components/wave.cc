@@ -18,7 +18,7 @@ WaveSystem::OnUpdate()
         if (waves.size() > 1) waves.pop(); // keep looping the last wave
 
         last_wave_time = now;
-        wave_remaining = current_wave.count;
+        wave_remaining = waves.front().count;
     }
     // spawn enemy
     else if (wave_remaining > 0 && duration_cast<milliseconds>(now-last_spawn_time) > current_wave.stagger) {

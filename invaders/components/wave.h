@@ -5,7 +5,8 @@
 #include <queue>
 #include <chrono>
 #include "a9e.h"
-#include "../spawner.h"
+
+using SpawnFunction = void(*)(Scene&, const vec2&, const vec2&);
 
 struct Wave {
     std::vector<SpawnFunction> spawns;

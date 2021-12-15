@@ -2,8 +2,7 @@
 #define __SPAWNER_H__
 
 #include "a9e.h"
-
-using SpawnFunction = void(*)(Scene&, const vec2&, const vec2&);
+#include "components/wave.h"
 
 void SpawnPlayer(Scene& scene, const vec2& pos, const vec2& dir);
 void SpawnPlayerBullet(Scene& scene, const vec2& pos, const vec2& dir = vec2{0.0f, -1.0f});
@@ -22,5 +21,7 @@ void SpawnChargerEnemyBullet(Scene& scene, const vec2& pos, const vec2& dir = ve
 
 void SpawnStarfishEnemy(Scene& scene, const vec2& pos, const vec2& dir);
 void SpawnStarfishEnemyBullet(Scene& scene, const vec2& pos, const vec2& dir);
+
+std::vector<Wave> MakeWaves();
 
 #endif // __SPAWNER_H__

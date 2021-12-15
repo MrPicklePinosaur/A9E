@@ -1,5 +1,6 @@
 
 #include <vector>
+#include <cstdlib>
 #include "spawner.h"
 #include "common.h"
 #include "components/enemycontroller.h"
@@ -148,8 +149,8 @@ void SpawnMachineGunnerEnemy(Scene& scene, const vec2& pos, const vec2& dir)
             SpawnBasicEnemyBullet(scene, transform.pos+vec2{0.0f, 1.0f});
         }
     });
-    scene.AddComponent<EnemyHp>(e, {1});
-    scene.AddComponent<ScoreReward>(e, {40});
+    scene.AddComponent<EnemyHp>(e, {2});
+    scene.AddComponent<ScoreReward>(e, {30});
     scene.AddComponent<Collider>(e, {
         .data = std::make_shared<BoxColData>(vec2{-1.0f, 0.0f}, vec2{1.0f, 1.0f}),
         .collider_id = CollisionTag_Enemy,
@@ -170,8 +171,8 @@ void SpawnBomberEnemy(Scene& scene, const vec2& pos, const vec2& dir)
             SpawnBomberEnemyBullet(scene, transform.pos+vec2{0.0f, 1.0f});
         }
     });
-    scene.AddComponent<EnemyHp>(e, {2});
-    scene.AddComponent<ScoreReward>(e, {30});
+    scene.AddComponent<EnemyHp>(e, {3});
+    scene.AddComponent<ScoreReward>(e, {50});
     scene.AddComponent<Collider>(e, {
         .data = std::make_shared<BoxColData>(vec2{-1.0f, 0.0f}, vec2{1.0f, 1.0f}),
         .collider_id = CollisionTag_Enemy,
@@ -215,7 +216,7 @@ void SpawnChargerEnemy(Scene& scene, const vec2& pos, const vec2& dir)
         }
     });
     scene.AddComponent<EnemyHp>(e, {1});
-    scene.AddComponent<ScoreReward>(e, {30});
+    scene.AddComponent<ScoreReward>(e, {20});
     scene.AddComponent<Collider>(e, {
         .data = std::make_shared<BoxColData>(vec2{0.0f, 0.0f}, vec2{1.0f, 1.0f}),
         .collider_id = CollisionTag_Enemy,
@@ -283,4 +284,172 @@ void SpawnStarfishEnemyBullet(Scene& scene, const vec2& pos, const vec2& dir)
         .isTrigger = true,
         .onCollide = enemyBulletOnCollide
     });
+}
+
+std::vector<Wave>
+MakeWaves()
+{
+    using namespace std::chrono_literals;
+
+    std::vector<Wave> waves = {
+        Wave{
+            .spawns = {SpawnBasicEnemy},
+            .count = 5,
+            .pad = 12s,
+            .stagger = 1500ms,
+            .spawn_point = {0, 2},
+            .direction = {1.0f, 0.0f}
+        },
+        Wave{
+            .spawns = {SpawnTwinGunnerEnemy},
+            .count = 10,
+            .pad = 5s,
+            .stagger = 1s,
+            .spawn_point = {80, 5},
+            .direction = {-1.0f, 0.0f}
+        },
+        Wave{
+            .spawns = {SpawnBomberEnemy},
+            .count = 3,
+            .pad = 15s,
+            .stagger = 5s,
+            .spawn_point = {0, 2},
+            .direction = {1.0f, 0.0f}
+        },
+        Wave{
+            .spawns = {SpawnMachineGunnerEnemy},
+            .count = 5,
+            .pad = 10s,
+            .stagger = 1s,
+            .spawn_point = {80, 5},
+            .direction = {-1.0f, 0.0f}
+        },
+    };
+
+    // charger storm
+    std::vector<int> spawn_pos = {40, 20, 50, 35, 10, 30};
+    for (auto& i : spawn_pos)
+        waves.push_back(
+            Wave{
+                .spawns = {SpawnChargerEnemy},
+                .count = 1,
+                .pad = 0s,
+                .stagger = 1s,
+                .spawn_point = {i, 0},
+                .direction = {0.0f, 1.0f}
+            }
+        );
+
+    // starfish
+    waves.push_back(
+        Wave{
+            .spawns = {SpawnStarfishEnemy},
+            .count = 3,
+            .pad = 7s,
+            .stagger = 3s,
+            .spawn_point = {0, 10},
+            .direction = {1.0f, 0.0f}
+        }
+    );
+
+    // bunch of alternating normal enemies
+    for (int i = 0; i < 4; ++i) {
+        waves.push_back(
+            Wave{
+                .spawns = {SpawnBasicEnemy},
+                .count = 2,
+                .pad = 0s,
+                .stagger = 500ms,
+                .spawn_point = {0, 5},
+                .direction = {1.0f, 0.0f}
+            }
+        );
+        waves.push_back(
+            Wave{
+                .spawns = {SpawnBasicEnemy},
+                .count = 2,
+                .pad = 0s,
+                .stagger = 500ms,
+                .spawn_point = {80, 5},
+                .direction = {-1.0f, 0.0f}
+            }
+        );
+
+    }
+
+    // alternate twin gunner + machine
+    for (int i = 0; i < 6; ++i) {
+        waves.push_back(
+            Wave{
+                .spawns = {SpawnTwinGunnerEnemy},
+                .count = 1,
+                .pad = 0s,
+                .stagger = 1s,
+                .spawn_point = {80, 9},
+                .direction = {-1.0f, 0.0f}
+            }
+        );
+        waves.push_back(
+            Wave{
+                .spawns = {SpawnMachineGunnerEnemy},
+                .count = 1,
+                .pad = 0s,
+                .stagger = 1s,
+                .spawn_point = {0, 7},
+                .direction = {1.0f, 0.0f}
+            }
+        );
+    }
+
+    // charger storm again
+    for (int i = 0; i < 10; ++i)
+        waves.push_back(
+            Wave{
+                .spawns = {SpawnChargerEnemy},
+                .count = 1,
+                .pad = 0s,
+                .stagger = 1s,
+                .spawn_point = {rand() % 80, 0},
+                .direction = {0.0f, 1.0f}
+            }
+        );
+
+    // bunch of bombers
+    for (int i = 0; i < 5; ++i) {
+        waves.push_back(
+            Wave{
+                .spawns = {SpawnBomberEnemy},
+                .count = 1,
+                .pad = 3s,
+                .stagger = 0s,
+                .spawn_point = {0, rand() % 10 + 2},
+                .direction = {1.0f, 0.0f}
+            }
+        );
+        waves.push_back(
+            Wave{
+                .spawns = {SpawnBomberEnemy},
+                .count = 1,
+                .pad = 3s,
+                .stagger = 0s,
+                .spawn_point = {80, rand() % 10 + 2},
+                .direction = {-1.0f, 0.0f}
+            }
+        );
+    }
+
+    // end
+    waves.push_back(
+        Wave{
+            .spawns = {SpawnStarfishEnemy},
+            .count = 1,
+            .pad = 1s,
+            .stagger = 1s,
+            .spawn_point = {0, 2},
+            .direction = {1.0f, 0.0f}
+        }
+    );
+
+    return waves;
+
 }
