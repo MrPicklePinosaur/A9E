@@ -37,6 +37,7 @@ struct RenderText {
 struct Render {
     RenderType render_type;
     std::variant<std::monostate, RenderChar, RenderBox, RenderBitmap, RenderText> data;
+    RenderStyleId render_style = RenderStyleNone;
     bool visible = true;
 };
 

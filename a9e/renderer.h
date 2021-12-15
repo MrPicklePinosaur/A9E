@@ -8,15 +8,16 @@
 #include "window.h"
 
 using RenderStyleId = int;
+extern const RenderStyleId RenderStyleNone;
 
 class Renderer
 {
 public:
     Renderer() {}
     virtual ~Renderer() {}
-    virtual void DrawChar(char c, int x, int y, RenderStyleId s = 0) = 0;
-    virtual void DrawBox(char c, int x, int y, int w, int h, RenderStyleId s = 0) = 0;
-    virtual void DrawText(const std::string& text, int x, int y, RenderStyleId s = 0) = 0;
+    virtual void DrawChar(char c, int x, int y, RenderStyleId s = RenderStyleNone) = 0;
+    virtual void DrawBox(char c, int x, int y, int w, int h, RenderStyleId s = RenderStyleNone) = 0;
+    virtual void DrawText(const std::string& text, int x, int y, RenderStyleId s = RenderStyleNone) = 0;
     virtual void WriteStatus(const std::string& s, int line) = 0;
     virtual void WriteStatus(const std::string& s, int x, int y) = 0;
     virtual void RefreshGameScreen() = 0;
@@ -36,7 +37,7 @@ class CursesRenderer final : public Renderer
 public:
     using ColorPairId = int;
     // TODO: maybe use enum class
-    enum Color { BLACK = 0, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE };
+    enum Color { BLACK = COLOR_BLACK, RED = COLOR_RED, GREEN = COLOR_GREEN, YELLOW = COLOR_YELLOW, BLUE = COLOR_BLUE, MAGENTA = COLOR_MAGENTA, CYAN = COLOR_CYAN, WHITE = COLOR_WHITE };
     enum Attr { NORMAL = A_NORMAL, STANDOUT = A_STANDOUT, UNDERLINE = A_UNDERLINE, REVERSE = A_REVERSE, BLINK = A_BLINK, DIM = A_DIM, BOLD = A_BOLD, PROTECT = A_PROTECT, INVIS = A_INVIS, ALTCHARSET = A_ALTCHARSET, CHARTEXT = A_CHARTEXT };
 
     struct RenderStyle {
@@ -56,9 +57,9 @@ private:
 public:
     CursesRenderer(bool enable_color, int screen_width = 80, int screen_height = 25, int status_height = 3);
     ~CursesRenderer();
-    void DrawChar(char c, int x, int y, RenderStyleId s = 0) override;
-    void DrawBox(char c, int x, int y, int w, int h, RenderStyleId s = 0) override;
-    void DrawText(const std::string& text, int x, int y, RenderStyleId s = 0) override;
+    void DrawChar(char c, int x, int y, RenderStyleId s = RenderStyleNone) override;
+    void DrawBox(char c, int x, int y, int w, int h, RenderStyleId s = RenderStyleNone) override;
+    void DrawText(const std::string& text, int x, int y, RenderStyleId s = RenderStyleNone) override;
     void WriteStatus(const std::string& s, int line) override;
     void WriteStatus(const std::string& s, int x, int y) override;
     void RefreshGameScreen() override;

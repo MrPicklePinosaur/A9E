@@ -2,6 +2,8 @@
 #include <ncurses.h>
 #include "renderer.h"
 
+const RenderStyleId RenderStyleNone = 0;
+
 CursesRenderer::CursesRenderer(bool enable_color, int screen_width, int screen_height, int status_height):
     Renderer{}, color_mode{enable_color}, screen_width{screen_width}, screen_height{screen_height}, status_height{status_height}
 {
@@ -44,7 +46,9 @@ CursesRenderer::DrawBox(char c, int x, int y, int w, int h, RenderStyleId s)
 void
 CursesRenderer::DrawText(const std::string& text, int x, int y, RenderStyleId s)
 {
+    EnableRenderStyle(s);
     mvwprintw(game_win->getwin(), y, x, text.c_str());
+    DisableRenderStyle(s);
 }
 
 void
@@ -108,7 +112,7 @@ CursesRenderer::RegisterColorPair(ColorPairId id, Color fg_color, Color bg_color
 void
 CursesRenderer::RegisterStyle(RenderStyleId id, RenderStyle style)
 {
-    if (id == 0) return;
+    if (id == RenderStyleNone) return;
     style_map[id] = style;
 }
 
@@ -141,18 +145,18 @@ CursesRenderer::CursesExit()
 void
 CursesRenderer::EnableRenderStyle(RenderStyleId id)
 {
-    if (id == 0) return; // render style id of 0 is special - it does nothing
+    if (id == RenderStyleNone) return; // render style id of 0 is special - it does nothing
     const RenderStyle& style = style_map.at(id);
-    attron(COLOR_PAIR(style.c_id));
-    attron(style.attr);
+    wattron(game_win->getwin(), COLOR_PAIR(style.c_id));
+    wattron(game_win->getwin(), style.attr);
 }
 
 void
 CursesRenderer::DisableRenderStyle(RenderStyleId id)
 {
-    if (id == 0) return;
+    if (id == RenderStyleNone) return;
     const RenderStyle& style = style_map.at(id);
-    attroff(COLOR_PAIR(style.c_id));
-    attroff(style.attr);
+    wattroff(game_win->getwin(), style.attr);
+    wattroff(game_win->getwin(), COLOR_PAIR(style.c_id));
 }
 

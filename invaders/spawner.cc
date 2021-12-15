@@ -12,7 +12,7 @@ void SpawnPlayer(Scene& scene, const vec2& pos, const vec2& dir)
     float playerSpeed = 20.0f;
     Entity e = scene.CreateEntity();
     scene.AddComponent<Transform>(e, {.pos = pos});
-    scene.AddComponent<Render>(e, {RenderType_Char, RenderChar{'A'}});
+    scene.AddComponent<Render>(e, {.render_type = RenderType_Char, .data = RenderChar{'A'}, .render_style = RenderStyle_Player});
     scene.AddComponent<PhysicsBody>(e, {
         .mass = 10.0f,
         .isSimulated = true,
@@ -89,7 +89,7 @@ void SpawnBasicEnemyBullet(Scene& scene, const vec2& pos, const vec2& dir)
     float bulletSpeed = 10.0f;
     Entity e = scene.CreateEntity();
     scene.AddComponent<Transform>(e, {.pos = pos});
-    scene.AddComponent<Render>(e, {RenderType_Char, RenderChar{'o'}});
+    scene.AddComponent<Render>(e, {.render_type = RenderType_Char, .data = RenderChar{'o'}, .render_style = RenderStyle_BasicEnemyBullet});
     scene.AddComponent<PhysicsBody>(e, {.velocity = dir*bulletSpeed});
     scene.AddComponent<Collider>(e, {
         .data = std::make_shared<BoxColData>(vec2{0.0f, 0.0f}, vec2{1.0f, 1.0f}),

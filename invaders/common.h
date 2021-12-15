@@ -26,4 +26,9 @@ enum EnemyBulletType {
     EnemyTypeBullet_MachineGun
 };
 
+enum RenderStyle {
+    RenderStyle_Player = 1,
+    RenderStyle_BasicEnemyBullet
+};
+
 #endif // __COMMON_H__

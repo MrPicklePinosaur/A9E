@@ -139,11 +139,30 @@ const std::vector<Wave> waves = {
     }
 };
 
+void
+InitRenderer(CursesRenderer& r)
+{
+    enum ColorPair {
+        ColorPair_Player = 1,
+        ColorPair_BasicEnemyBullet,
+    };
+
+    // setup colors pairs
+    r.RegisterColorPair(ColorPair_Player, CursesRenderer::BLUE, CursesRenderer::BLACK);
+    r.RegisterStyle(RenderStyle_Player, {ColorPair_Player, CursesRenderer::BOLD});
+
+    r.RegisterColorPair(ColorPair_BasicEnemyBullet, CursesRenderer::RED, CursesRenderer::BLACK);
+    r.RegisterStyle(RenderStyle_BasicEnemyBullet, {ColorPair_BasicEnemyBullet, CursesRenderer::NORMAL});
+
+}
+
 int
 main(int argc, char** argv)
 {
-    CursesRenderer renderer{false};
+    CursesRenderer renderer{true};
     CursesInputer inputer{};
+
+    InitRenderer(renderer);
 
     { // menu scene
         Scene scene{&renderer, &inputer};
