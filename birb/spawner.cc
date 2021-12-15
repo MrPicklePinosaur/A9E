@@ -1,20 +1,28 @@
 
 #include <string>
 #include <cstdlib>
+#include <chrono>
 #include "common.h"
 #include "components/playercontroller.h"
+#include "components/animate.h"
 #include "components/score.h"
 #include "spawner.h"
 
 void SpawnPlayer(Scene& scene, const vec2& pos)
 {
+    using namespace std::chrono_literals;
+
     Entity e = scene.CreateEntity();
-    RenderBitmap bm = {{
+    RenderBitmap bm1 = {{
         {'/',-1,0},{'O',0,0},{'>',1,0}
     }};
+    RenderBitmap bm2 = {{
+        {'\\',-1,0},{'O',0,0},{'>',1,0}
+    }};
+    std::vector<Render> frames = {{RenderType_Bitmap, bm1},{RenderType_Bitmap,bm2}};
 
     scene.AddComponent<Transform>(e, {.pos = pos});
-    scene.AddComponent<Render>(e, {RenderType_Bitmap, bm});
+    scene.AddComponent<Animate>(e, {500ms,frames});
     scene.AddComponent<PhysicsBody>(e, {
         .mass = 1.0f,
         .isSimulated = true,

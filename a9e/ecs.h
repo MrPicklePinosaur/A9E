@@ -197,6 +197,7 @@ template<typename T> void
 Scene::RemoveComponent(Entity e)
 {
     cm->RemoveComponent<T>(e);
+    em->RemoveComponent<T>(e);
 }
 
 template<typename T> T&

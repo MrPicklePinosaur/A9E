@@ -3,6 +3,7 @@
 #include "components/playercontroller.h"
 #include "components/score.h"
 #include "components/pipemaker.h"
+#include "components/animate.h"
 #include "spawner.h"
 #include "common.h"
 
@@ -14,7 +15,7 @@ main(int argc, char** argv)
     CursesRenderer renderer{false};
     CursesInputer inputer{};
 
-    {
+    try {
         Scene scene{&renderer, &inputer};
 
         scene.RegisterSystem<RenderSystem>();
@@ -23,6 +24,7 @@ main(int argc, char** argv)
         scene.RegisterSystem<PlayerControllerSystem>();
         auto* pipemaker_system = scene.RegisterSystem<PipeMakerSystem>();
         scene.RegisterSystem<ScoreSystem>();
+        scene.RegisterSystem<AnimateSystem>();
 
         collider_system->SetCollidesWith(CollisionTag_Player, CollisionTag_Pipe);
         collider_system->SetCollidesWith(CollisionTag_Player, CollisionTag_PipeGap);
@@ -32,6 +34,8 @@ main(int argc, char** argv)
 
         scene.Run();
 
+    } catch(const char* e) {
+        std::cout << e << std::endl;
     }
 
     return 0;
