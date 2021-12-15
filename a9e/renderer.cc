@@ -21,24 +21,28 @@ CursesRenderer::~CursesRenderer()
 }
 
 void
-CursesRenderer::DrawChar(char c, int x, int y)
+CursesRenderer::DrawChar(char c, int x, int y, RenderStyleId s)
 {
     if (x < 0 || y < 0) return;
     // TODO account for borders and stuff
     /* if (x > screen_width || y > screen_height) return; */
 
+    EnableRenderStyle(s);
     mvwprintw(game_win->getwin(), y, x, std::string(1, c).c_str());
+    DisableRenderStyle(s);
 }
 
 void
-CursesRenderer::DrawBox(char c, int x, int y, int w, int h)
+CursesRenderer::DrawBox(char c, int x, int y, int w, int h, RenderStyleId s)
 {
+    EnableRenderStyle(s);
     for (int i = 0; i < h; ++i)
         mvwprintw(game_win->getwin(), y+i, x, std::string(w, c).c_str());
+    DisableRenderStyle(s);
 }
 
 void
-CursesRenderer::DrawText(const std::string& text, int x, int y)
+CursesRenderer::DrawText(const std::string& text, int x, int y, RenderStyleId s)
 {
     mvwprintw(game_win->getwin(), y, x, text.c_str());
 }
@@ -95,6 +99,20 @@ CursesRenderer::ClearStatusScreen()
 }
 
 void
+CursesRenderer::RegisterColorPair(ColorPairId id, Color fg_color, Color bg_color)
+{
+    init_pair(id, fg_color, bg_color);
+}
+
+
+void
+CursesRenderer::RegisterStyle(RenderStyleId id, RenderStyle style)
+{
+    if (id == 0) return;
+    style_map[id] = style;
+}
+
+void
 CursesRenderer::CursesInit()
 {
     // need to make sure this isn't called twice
@@ -119,3 +137,22 @@ CursesRenderer::CursesExit()
 {
     endwin();
 }
+
+void
+CursesRenderer::EnableRenderStyle(RenderStyleId id)
+{
+    if (id == 0) return; // render style id of 0 is special - it does nothing
+    const RenderStyle& style = style_map.at(id);
+    attron(COLOR_PAIR(style.c_id));
+    attron(style.attr);
+}
+
+void
+CursesRenderer::DisableRenderStyle(RenderStyleId id)
+{
+    if (id == 0) return;
+    const RenderStyle& style = style_map.at(id);
+    attroff(COLOR_PAIR(style.c_id));
+    attroff(style.attr);
+}
+
