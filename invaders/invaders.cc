@@ -6,6 +6,7 @@
 #include "a9e.h"
 #include "components/ui/menucontroller.h"
 #include "components/ui/exitcontroller.h"
+#include "components/ui/blink.h"
 #include "components/playercontroller.h"
 #include "components/enemycontroller.h"
 #include "components/playerhp.h"
@@ -52,10 +53,12 @@ main(int argc, char** argv)
     InitRenderer(renderer);
 
     { // menu scene
+
         Scene scene{&renderer, &inputer};
 
         scene.RegisterSystem<RenderSystem>();
         scene.RegisterSystem<MenuControllerSystem>();
+        scene.RegisterSystem<BlinkSystem>();
 
         std::vector<std::string> logo = {
             " _                     _                ",
@@ -72,9 +75,11 @@ main(int argc, char** argv)
         }
  
         {
+            using namespace std::chrono_literals;
             Entity e = scene.CreateEntity();
             scene.AddComponent<Transform>(e, {.pos = {27, 18}});
             scene.AddComponent<Render>(e, {RenderType_Text, RenderText{"[ Press Space to Begin ]", RenderStyle_StartText}});
+            scene.AddComponent<Blink>(e, {1000ms});
         }
 
         renderer.WriteStatus("Controls:", 0);
