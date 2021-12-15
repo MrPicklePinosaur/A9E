@@ -35,7 +35,7 @@ a wiki for **A9E** may or may not be coming in the future.
 
 ## TODO
 - [x] entity component system
-- [ ] color
+- [x] color
 - [ ] terminal beep
 - [ ] utf8 support
 - [x] better way of assigning entity ids
@@ -45,7 +45,7 @@ a wiki for **A9E** may or may not be coming in the future.
 - [x] collision mask
 - [x] error/exception handling
 - [x] ability to create and destroy entities in update loop
-- [ ] renderer + input should really be decoupled from scene
+- [x] renderer + input should really be decoupled from scene
 - [x] build shared library
 - [ ] package for linux distros
 

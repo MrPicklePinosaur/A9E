@@ -57,7 +57,7 @@ void SpawnPlayerBullet(Scene& scene, const vec2& pos, const vec2& dir)
     float bulletSpeed = 20.0f;
     Entity e = scene.CreateEntity();
     scene.AddComponent<Transform>(e, {.pos = pos});
-    scene.AddComponent<Render>(e, {RenderType_Char, RenderChar{'|'}});
+    scene.AddComponent<Render>(e, {RenderType_Char, RenderChar{'|', RenderStyle_Player}});
     scene.AddComponent<PhysicsBody>(e, {.mass = 1.0f, .isSimulated = true, .useGravity = false, .velocity = dir*bulletSpeed});
     scene.AddComponent<Collider>(e, {
         .data = std::make_shared<BoxColData>(vec2{0.0f, 0.0f}, vec2{1.0f, 1.0f}),
@@ -184,9 +184,9 @@ void SpawnBomberEnemyBullet(Scene& scene, const vec2& pos, const vec2& dir)
 {
     float bulletSpeed = 20.0f;
     RenderBitmap bm = RenderBitmap{{
-        {'\'',-1,-1},{'^',0,-1},{'\'',1,-1},
-        {'<' ,-1, 0},{'O',0, 0},{'>' ,1, 0},
-        {'\'',-1, 1},{'v',0, 1},{'\'',1, 1}
+        {'\'',-1,-1,RenderStyle_BasicEnemyBullet},{'^',0,-1,RenderStyle_BasicEnemyBullet},{'\'',1,-1,RenderStyle_BasicEnemyBullet},
+        {'<' ,-1, 0,RenderStyle_BasicEnemyBullet},{'O',0, 0,RenderStyle_BasicEnemyBullet},{'>' ,1, 0,RenderStyle_BasicEnemyBullet},
+        {'\'',-1, 1,RenderStyle_BasicEnemyBullet},{'v',0, 1,RenderStyle_BasicEnemyBullet},{'\'',1, 1,RenderStyle_BasicEnemyBullet}
     }};
 
     Entity e = scene.CreateEntity();
@@ -230,7 +230,7 @@ void SpawnChargerEnemyBullet(Scene& scene, const vec2& pos, const vec2& dir)
 
     Entity e = scene.CreateEntity();
     scene.AddComponent<Transform>(e, {.pos = pos});
-    scene.AddComponent<Render>(e, {RenderType_Char, RenderChar{'V'}});
+    scene.AddComponent<Render>(e, {RenderType_Char, RenderChar{'V', RenderStyle_BasicEnemyBullet}});
     scene.AddComponent<PhysicsBody>(e, {.velocity = dir*bulletSpeed});
     scene.AddComponent<Collider>(e, {
         .data = std::make_shared<BoxColData>(vec2{-1.0f, -1.0f}, vec2{1.0f, 1.0f}),
@@ -276,7 +276,7 @@ void SpawnStarfishEnemyBullet(Scene& scene, const vec2& pos, const vec2& dir)
 
     Entity e = scene.CreateEntity();
     scene.AddComponent<Transform>(e, {.pos = pos});
-    scene.AddComponent<Render>(e, {RenderType_Char, RenderChar{'*'}});
+    scene.AddComponent<Render>(e, {RenderType_Char, RenderChar{'*', RenderStyle_BasicEnemyBullet}});
     scene.AddComponent<PhysicsBody>(e, {.velocity = dir*bulletSpeed});
     scene.AddComponent<Collider>(e, {
         .data = std::make_shared<BoxColData>(vec2{-1.0f, -1.0f}, vec2{1.0f, 1.0f}),
@@ -345,7 +345,7 @@ MakeWaves()
         Wave{
             .spawns = {SpawnStarfishEnemy},
             .count = 3,
-            .pad = 7s,
+            .pad = 15s,
             .stagger = 3s,
             .spawn_point = {0, 10},
             .direction = {1.0f, 0.0f}

@@ -22,6 +22,7 @@ InitRenderer(CursesRenderer& r)
         ColorPair_Player = 1,
         ColorPair_BasicEnemyBullet,
         ColorPair_StartText,
+        ColorPair_LogoText,
     };
 
     // setup colors pairs
@@ -33,6 +34,9 @@ InitRenderer(CursesRenderer& r)
 
     r.RegisterColorPair(ColorPair_StartText, CursesRenderer::YELLOW, CursesRenderer::BLACK);
     r.RegisterStyle(RenderStyle_StartText, {ColorPair_StartText, CursesRenderer::BOLD});
+
+    r.RegisterColorPair(ColorPair_LogoText, CursesRenderer::CYAN, CursesRenderer::BLACK);
+    r.RegisterStyle(RenderStyle_LogoText, {ColorPair_LogoText, CursesRenderer::BOLD});
 
 }
 
@@ -53,14 +57,33 @@ main(int argc, char** argv)
         scene.RegisterSystem<RenderSystem>();
         scene.RegisterSystem<MenuControllerSystem>();
 
+        std::vector<std::string> logo = {
+            " _                     _                ",
+            "(_)_ ____   ____ _  __| | ___ _ __ ___  ",
+            "| | '_ \\ \\ / / _` |/ _` |/ _ \\ '__/ __| ",
+            "| | | | \\ V / (_| | (_| |  __/ |  \\__ \\ ",
+            "|_|_| |_|\\_/ \\__,_|\\__,_|\\___|_|  |___/ ",
+            "                Created using A9E       "
+        };
+        for (int i = 0; i < logo.size(); ++i) {
+            Entity e = scene.CreateEntity();
+            scene.AddComponent<Transform>(e, {.pos = {20, 6+i}});
+            scene.AddComponent<Render>(e, {RenderType_Text, RenderText{logo[i], RenderStyle_LogoText}});
+        }
+ 
         {
             Entity e = scene.CreateEntity();
-            scene.AddComponent<Transform>(e, {.pos = {10, 10}});
+            scene.AddComponent<Transform>(e, {.pos = {27, 18}});
             scene.AddComponent<Render>(e, {RenderType_Text, RenderText{"[ Press Space to Begin ]", RenderStyle_StartText}});
         }
 
+        renderer.WriteStatus("Controls:", 0);
+        renderer.WriteStatus("[A] + [D] to move left and right", 1);
+        renderer.WriteStatus("[SPACE] to shoot", 2);
+
         scene.Run();
     }
+    renderer.ClearStatusScreen();
 
     { // game scene
         Scene scene{&renderer, &inputer};
